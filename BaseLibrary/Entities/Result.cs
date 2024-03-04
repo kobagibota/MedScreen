@@ -1,6 +1,6 @@
-﻿using MQC.BaseLibrary.Extentions;
+﻿using BaseLibrary.Extentions;
 
-namespace MQC.BaseLibrary.Entities
+namespace BaseLibrary.Entities
 {
     public class Result
     {

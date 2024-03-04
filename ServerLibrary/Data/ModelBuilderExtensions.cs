@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MQC.BaseLibrary.Entities;
-using MQC.BaseLibrary.Extentions;
+using BaseLibrary.Entities;
+using BaseLibrary.Extentions;
 
-namespace MQC.ServerLibrary.Data
+namespace ServerLibrary.Data
 {
     public static class ModelBuilderExtensions
     {

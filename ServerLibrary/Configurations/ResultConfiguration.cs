@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using MQC.BaseLibrary.Entities;
+using BaseLibrary.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MQC.ServerLibrary.Configurations
+namespace ServerLibrary.Configurations
 {
     public class ResultConfiguration : IEntityTypeConfiguration<Result>
     {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MQC.BaseLibrary.Entities;
-using MQC.ServerLibrary.Configurations;
+using BaseLibrary.Entities;
+using ServerLibrary.Configurations;
 
-namespace MQC.ServerLibrary.Data
+namespace ServerLibrary.Data
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser, AppRole, Guid>(options)
     {

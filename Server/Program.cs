@@ -1,5 +1,8 @@
+using BaseLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MQC.ServerLibrary.Data;
+using Server.Services;
+using ServerLibrary.Data;
+using ServerLibrary.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,10 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+
+// Add application services.
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ILaboratoryServices, LaboratoryServices>();
 
 var app = builder.Build();
 

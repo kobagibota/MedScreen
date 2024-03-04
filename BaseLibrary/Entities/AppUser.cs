@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace MQC.BaseLibrary.Entities
+namespace BaseLibrary.Entities
 {
     public class AppUser : IdentityUser<Guid>
     {

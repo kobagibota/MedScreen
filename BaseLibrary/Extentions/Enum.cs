@@ -1,4 +1,4 @@
-﻿namespace MQC.BaseLibrary.Extentions
+﻿namespace BaseLibrary.Extentions
 {
     public enum Threshold
     {

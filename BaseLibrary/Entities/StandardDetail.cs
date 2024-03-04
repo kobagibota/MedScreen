@@ -1,7 +1,7 @@
-﻿using MQC.BaseLibrary.Extentions;
+﻿using BaseLibrary.Extentions;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MQC.BaseLibrary.Entities
+namespace BaseLibrary.Entities
 {
     public class StandardDetail
     {

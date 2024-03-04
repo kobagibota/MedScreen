@@ -1,4 +1,4 @@
-﻿namespace MQC.BaseLibrary.Entities
+﻿namespace BaseLibrary.Entities
 {
     public class Standard
     {

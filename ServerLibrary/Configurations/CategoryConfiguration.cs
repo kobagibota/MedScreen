@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using MQC.BaseLibrary.Entities;
+using BaseLibrary.Entities;
 
-namespace MQC.ServerLibrary.Configurations
+namespace ServerLibrary.Configurations
 {
     public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {

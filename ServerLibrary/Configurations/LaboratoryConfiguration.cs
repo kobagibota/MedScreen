@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using MQC.BaseLibrary.Entities;
+using BaseLibrary.Entities;
+using BaseLibrary.Extentions;
 
-namespace MQC.ServerLibrary.Configurations
+namespace ServerLibrary.Configurations
 {
     public class LaboratoryConfiguration : IEntityTypeConfiguration<Laboratory>
     {
@@ -15,6 +16,7 @@ namespace MQC.ServerLibrary.Configurations
             builder.HasIndex(x => x.OrganizationName);
             builder.Property(x => x.OrganizationName).IsRequired();
             builder.Property(x => x.LabName).IsRequired();
+            builder.Property(x => x.LabStatus).HasDefaultValue(LabStatus.Active);
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     public class LaboratoryDto
     {
+        public int Id { get; set; }
         public required string OrganizationName { get; set; }
         public required string LabName { get; set; }
         public string? Address { get; set; }

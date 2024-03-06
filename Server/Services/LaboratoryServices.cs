@@ -1,16 +1,17 @@
 ﻿using BaseLibrary.Dtos;
 using BaseLibrary.Entities;
 using BaseLibrary.Interfaces;
+using BaseLibrary.Respones;
 
 namespace Server.Services
 {
     public interface ILaboratoryServices
     {
-        Task<IEnumerable<Laboratory>> GetAll();
-        Task<Laboratory?> GetById(int laboratoryId);
-        Task<Laboratory> Add(LaboratoryDto newLaboratory);
-        Task<bool> Update(int id, LaboratoryDto laboratory);
-        Task<bool> Delete(int laboratoryId);
+        Task<ServiceResponse<IEnumerable<Laboratory>>> GetAll();
+        Task<ServiceResponse<Laboratory?>> GetById(int laboratoryId);
+        Task<ServiceResponse<Laboratory>> Add(LaboratoryDto newLaboratory);
+        Task<ServiceResponse<bool>> Update(int id, LaboratoryDto laboratory);
+        Task<ServiceResponse<bool>> Delete(int laboratoryId);
     }
 
     public class LaboratoryServices : ILaboratoryServices
@@ -22,72 +23,150 @@ namespace Server.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Laboratory> Add(LaboratoryDto newLaboratory)
+        public async Task<ServiceResponse<Laboratory>> Add(LaboratoryDto newLaboratory)
         {
-            if (newLaboratory == null)
+            try
             {
-                return null;
-            }
+                if (newLaboratory == null)
+                {
+                    return new ServiceResponse<Laboratory>
+                    {
+                        Success = false,
+                        Message = $"Thiếu thông tin phòng xét nghiệm."
+                    };
+                }
 
-            var newLab = new Laboratory
-            {
-                LabName = newLaboratory.LabName,
-                OrganizationName = newLaboratory.OrganizationName,
-                Address = newLaboratory.Address,
-                Email = newLaboratory.Email,
-                PhoneNumber = newLaboratory.PhoneNumber,
-                Logo = newLaboratory.Logo
-            };
+                var newLab = new Laboratory
+                {
+                    LabName = newLaboratory.LabName,
+                    OrganizationName = newLaboratory.OrganizationName,
+                    Address = newLaboratory.Address,
+                    Email = newLaboratory.Email,
+                    PhoneNumber = newLaboratory.PhoneNumber,
+                    Logo = newLaboratory.Logo
+                };
 
-            await _unitOfWork.LaboratoryRepository.AddAsync(newLab);
-            await _unitOfWork.CommitAsync();
-            return newLab;
-        }
-
-        public async Task<bool> Delete(int laboratoryId)
-        {
-            var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == laboratoryId);
-            if (lab != null)
-            {
-                _unitOfWork.LaboratoryRepository.Remove(lab);
+                await _unitOfWork.LaboratoryRepository.AddAsync(newLab);
                 await _unitOfWork.CommitAsync();
-                return true;
+
+                return new ServiceResponse<Laboratory>
+                {
+                    Success = true,
+                    Data = newLab,
+                    Message = $"Đã thêm thành công!"
+                };
             }
-            else 
-            { 
-                return false; 
+            catch (Exception)
+            {
+
+                return new ServiceResponse<Laboratory>
+                {
+                    Success = false,
+                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                };
             }
+            
         }
 
-        public async Task<IEnumerable<Laboratory>> GetAll()
+        public async Task<ServiceResponse<bool>> Delete(int laboratoryId)
         {
-            var labList = await _unitOfWork.LaboratoryRepository.GetAllAsync();
-            return labList;
-        }
-
-        public async Task<Laboratory?> GetById(int laboratoryId)
-        {
-            if (laboratoryId != 0)
+            try
             {
                 var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == laboratoryId);
-                if (lab != null)
+                if (lab == null)
                 {
-                    return lab;
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = $"Tìm không thấy phòng xét nghiệm cần xoá!"
+                    };
                 }
+
+                _unitOfWork.LaboratoryRepository.Remove(lab);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = $"Đã xoá thành công!"
+                };
             }
-            return null;
+            catch (Exception)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                };
+            }
+            
         }
 
-        public async Task<bool> Update(int id, LaboratoryDto laboratory)
+        public async Task<ServiceResponse<IEnumerable<Laboratory>>> GetAll()
         {
-            if (laboratory == null)
+            try
             {
-                return false;
-            }            
+                var labList = await _unitOfWork.LaboratoryRepository.GetAllAsync();
+                return new ServiceResponse<IEnumerable<Laboratory>>
+                {
+                    Success = true,
+                    Data = labList
+                };
+            }
+            catch (Exception)
+            {
+                return new ServiceResponse<IEnumerable<Laboratory>>
+                {
+                    Success = false,
+                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                };
+            }
+        }
 
-            var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == id);
-            if (lab != null)
+        public async Task<ServiceResponse<Laboratory?>> GetById(int laboratoryId)
+        {
+            try
             {
+                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == laboratoryId);
+                if (lab == null)
+                {
+                    return new ServiceResponse<Laboratory?>
+                    {
+                        Success = false,
+                        Message = $"Không có phòng xét nghiệm nào với Id = {laboratoryId}."
+                    };
+                }
+
+                return new ServiceResponse<Laboratory?>
+                {
+                    Success = false,
+                    Data = lab
+                };
+            }
+            catch (Exception)
+            {
+                return new ServiceResponse<Laboratory?>
+                {
+                    Success = false,
+                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Update(int id, LaboratoryDto laboratory)
+        {
+            try
+            {
+                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == id);
+                if (lab == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = $"Không có phòng xét nghiệm nào với Id = {id}."
+                    };
+                }
+
                 lab.LabName = laboratory.LabName;
                 lab.OrganizationName = laboratory.OrganizationName;
                 lab.Address = laboratory.Address;
@@ -99,13 +178,20 @@ namespace Server.Services
                 _unitOfWork.LaboratoryRepository.Update(lab);
                 await _unitOfWork.CommitAsync();
 
-                return true;
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = $"Đã cập nhật thành công.",
+                };
             }
-            else
+            catch (Exception)
             {
-                return false;
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                };
             }
-
         }
     }
 }

@@ -8,12 +8,12 @@ namespace ServerLibrary.Repositories
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected readonly AppDbContext _dbContext;
-        private readonly DbSet<T> _entitiySet;
+        private readonly DbSet<T> _entitySet;
 
         public GenericRepository(AppDbContext context)
         {
             _dbContext = context;
-            _entitiySet = _dbContext.Set<T>();
+            _entitySet = _dbContext.Set<T>();
         }
 
         public void Add(T entity)
@@ -38,32 +38,33 @@ namespace ServerLibrary.Repositories
 
         public T Get(Expression<Func<T, bool>> expression)
         {
-            return _entitiySet.FirstOrDefault(expression);
+            T result = _entitySet.FirstOrDefault(expression);
+            return result;
         }
 
         public async Task<T> GetAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
         {
-            return await _entitiySet.FirstOrDefaultAsync(expression, cancellationToken);
+            return await _entitySet.FirstOrDefaultAsync(expression, cancellationToken);
         }
 
         public IEnumerable<T> GetAll()
         {
-            return _entitiySet.AsEnumerable();
+            return _entitySet.AsEnumerable();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _entitiySet.ToListAsync(cancellationToken);
+            return await _entitySet.ToListAsync(cancellationToken);
         }
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
         {
-            return _entitiySet.Where(expression).AsEnumerable();
+            return _entitySet.Where(expression).AsEnumerable();
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
         {
-            return await _entitiySet.Where(expression).ToListAsync(cancellationToken);
+            return await _entitySet.Where(expression).ToListAsync(cancellationToken);
         }
 
         public void Remove(T entity)

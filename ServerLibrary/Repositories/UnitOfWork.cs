@@ -5,7 +5,7 @@ namespace ServerLibrary.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        #region Member
+        #region Private member
 
         private readonly AppDbContext _dbContext;
         private ILaboratoryRepository _laboratoryRepository;

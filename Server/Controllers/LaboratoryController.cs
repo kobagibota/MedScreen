@@ -53,9 +53,14 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var lab = await _laboratoryServices.Add(request);
+                var labResponse = await _laboratoryServices.Add(request);
 
-                return CreatedAtAction(nameof(GetById), new { id = lab.Id }, lab);
+                if (labResponse.Success)
+                {
+                    return Ok(labResponse);
+                }
+
+                return BadRequest(labResponse.Message);
             }
             catch (Exception ex)
             {
@@ -74,12 +79,12 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var lab = await _laboratoryServices.Update(id, request);
-                if (lab)
+                var labResponse = await _laboratoryServices.Update(id, request);
+                if (labResponse.Success)
                 {
-                    return Ok(lab);
+                    return Ok(labResponse);
                 }
-                return BadRequest();
+                return BadRequest(labResponse.Message);
             }
             catch (Exception ex)
             {
@@ -93,14 +98,14 @@ namespace Server.Controllers
         {
             try
             {
-                var result = await _laboratoryServices.Delete(id);
+                var labResponse = await _laboratoryServices.Delete(id);
 
-                if (result == false)
+                if (!labResponse.Success)
                 {
-                    return NotFound($"Không tồn tại phòng xét nghiệm có id = {id} trong hệ thống!");
+                    return BadRequest(labResponse.Message);
                 }
 
-                return Ok(result);
+                return Ok(labResponse);
             }
             catch (Exception ex)
             {

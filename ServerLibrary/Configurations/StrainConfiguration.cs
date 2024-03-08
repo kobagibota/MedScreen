@@ -12,6 +12,8 @@ namespace ServerLibrary.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
+            builder.HasIndex(x => x.StrainName).IsUnique();
+
             builder.Property(x => x.GroupId).IsRequired();
             builder.Property(x => x.StrainName).IsRequired();
 

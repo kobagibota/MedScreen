@@ -12,6 +12,7 @@ namespace ServerLibrary.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
+            builder.HasIndex(x=>x.CategoryName).IsUnique();
             builder.Property(x => x.CategoryName).IsRequired().HasMaxLength(200);
         }
     }

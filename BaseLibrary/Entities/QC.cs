@@ -11,7 +11,7 @@ namespace BaseLibrary.Entities
         public required DateTime QCDate { get; set; }
         public int? ReQCId { get; set; }
         public string? Action { get; set; }
-        public QCStatus Status { get; set; }
+        public QCStatus Status { get; set; } = QCStatus.New;
         public DateTime DateCreated { get; set; }
 
         public virtual required Laboratory Laboratory { get; set; }

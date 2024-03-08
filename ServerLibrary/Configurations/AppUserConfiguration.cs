@@ -11,7 +11,7 @@ namespace ServerLibrary.Configurations
             builder.ToTable("AppUsers");
             builder.HasKey(x => x.Id);
 
-            builder.HasIndex(x => x.UserName);
+            builder.HasIndex(x => x.UserName).IsUnique();
             builder.Property(x => x.UserName).IsRequired().IsUnicode(false).HasMaxLength(200);
             builder.Property(x => x.FirstName).HasMaxLength(100);
             builder.Property(x => x.LastName).HasMaxLength(200);

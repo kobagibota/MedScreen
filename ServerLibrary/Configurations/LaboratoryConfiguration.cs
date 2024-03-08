@@ -13,8 +13,7 @@ namespace ServerLibrary.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-            builder.HasIndex(x => x.OrganizationName);
-            builder.Property(x => x.OrganizationName).IsRequired();
+            builder.HasIndex(x => x.OrganizationName).IsUnique();
             builder.Property(x => x.LabName).IsRequired();
             builder.Property(x => x.LabStatus).HasDefaultValue(LabStatus.Active);
         }

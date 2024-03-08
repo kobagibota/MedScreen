@@ -1,4 +1,5 @@
 ﻿using BaseLibrary.Dtos;
+using BaseLibrary.Extentions;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
 
@@ -69,7 +70,7 @@ namespace Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] LaboratoryDto request)
         {
             try
@@ -80,6 +81,25 @@ namespace Server.Controllers
                 }
 
                 var labResponse = await _laboratoryServices.Update(id, request);
+                if (labResponse.Success)
+                {
+                    return Ok(labResponse);
+                }
+                return BadRequest(labResponse.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> ChangeStatus(int id, [FromBody] LabStatus status)
+        {
+            try
+            {
+                var labResponse = await _laboratoryServices.ChangeStatus(id, status);
                 if (labResponse.Success)
                 {
                     return Ok(labResponse);

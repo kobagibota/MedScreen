@@ -1,10 +1,13 @@
 ﻿using BaseLibrary.Dtos;
 using BaseLibrary.Entities;
+using BaseLibrary.Extentions;
 using BaseLibrary.Interfaces;
 using BaseLibrary.Respones;
 
 namespace Server.Services
 {
+    #region Interface
+
     public interface ILaboratoryServices
     {
         Task<ServiceResponse<IEnumerable<Laboratory>>> GetAll();
@@ -12,16 +15,30 @@ namespace Server.Services
         Task<ServiceResponse<Laboratory>> Add(LaboratoryDto newLaboratory);
         Task<ServiceResponse<bool>> Update(int id, LaboratoryDto laboratory);
         Task<ServiceResponse<bool>> Delete(int laboratoryId);
+
+        Task<ServiceResponse<bool>> ChangeStatus(int id, LabStatus status);
     }
+
+    #endregion
 
     public class LaboratoryServices : ILaboratoryServices
     {
+        #region Private properties
+
         public IUnitOfWork _unitOfWork;
+
+        #endregion
+        
+        #region Constructor
 
         public LaboratoryServices(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Methods
 
         public async Task<ServiceResponse<Laboratory>> Add(LaboratoryDto newLaboratory)
         {
@@ -56,16 +73,61 @@ namespace Server.Services
                     Message = $"Đã thêm thành công!"
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                string errorMessage = "Xảy ra lỗi trong quá trình thêm.";
 
+                if (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException)
+                {
+                    int errorCode = sqlException.Number;
+                    if (errorCode == 2627 || errorCode == 2601)
+                    {
+                        errorMessage = "Xảy ra lỗi do trùng tên tổ chức.";
+                    }
+                }
+                
                 return new ServiceResponse<Laboratory>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                    Message = errorMessage
                 };
             }
             
+        }
+
+        public async Task<ServiceResponse<bool>> ChangeStatus(int id, LabStatus status)
+        {
+            try
+            {
+                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == id);
+                if (lab == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = $"Không có phòng xét nghiệm nào với Id = {id}."
+                    };
+                }
+
+                lab.LabStatus = status;
+
+                _unitOfWork.LaboratoryRepository.Update(lab);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = $"Đã cập nhật trạng thái thành công.",
+                };
+            }
+            catch (Exception)
+            {                
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = $"Xảy ra lỗi trong quá trình cập nhật trạng thái."
+                };
+            }
         }
 
         public async Task<ServiceResponse<bool>> Delete(int laboratoryId)
@@ -96,7 +158,7 @@ namespace Server.Services
                 return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                    Message = $"Xảy ra lỗi trong quá trình xoá."
                 };
             }
             
@@ -118,7 +180,7 @@ namespace Server.Services
                 return new ServiceResponse<IEnumerable<Laboratory>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách phòng xét nghiệm."
                 };
             }
         }
@@ -184,14 +246,27 @@ namespace Server.Services
                     Message = $"Đã cập nhật thành công.",
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật.";
+
+                if (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException)
+                {
+                    int errorCode = sqlException.Number;
+                    if (errorCode == 2627 || errorCode == 2601)
+                    {
+                        errorMessage = "Xảy ra lỗi do trùng tên tổ chức.";
+                    }
+                }
+
                 return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình thêm."
+                    Message = errorMessage
                 };
             }
         }
+
+        #endregion
     }
 }

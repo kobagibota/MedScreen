@@ -11,7 +11,7 @@ namespace BaseLibrary.Entities
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public byte[]? Logo { get; set; }
-        public LabStatus LabStatus { get; set; }
+        public LabStatus LabStatus { get; set; } = LabStatus.Active;
 
         public List<AppUser>? Users { get; set; }
         public List<QC>? QCs { get; set; }

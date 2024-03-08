@@ -12,6 +12,8 @@ namespace ServerLibrary.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
+            builder.HasIndex(x=>x.QCName).IsUnique();
+
             builder.Property(x => x.LabId).IsRequired();
             builder.Property(x => x.MethodId).IsRequired();
             builder.Property(x => x.CategoryId).IsRequired();

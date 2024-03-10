@@ -1,4 +1,6 @@
-﻿using BaseLibrary.Entities;
+﻿using BaseLibrary.Dtos;
+using BaseLibrary.Entities;
+using BaseLibrary.Extentions;
 using BaseLibrary.Interfaces;
 using BaseLibrary.Respones;
 
@@ -6,18 +8,18 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface IQCActionServices
+    public interface ICategoryServices
     {
-        Task<ServiceResponse<IEnumerable<QCAction>>> GetAll();
-        Task<ServiceResponse<QCAction?>> GetById(int qcActionId);
-        Task<ServiceResponse<QCAction>> Add(QCAction newQCAction);
-        Task<ServiceResponse<bool>> Update(int id, QCAction qcAction);
-        Task<ServiceResponse<bool>> Delete(int qcActionId);
+        Task<ServiceResponse<IEnumerable<CategoryDto>>> GetAll();
+        Task<ServiceResponse<CategoryDto?>> GetById(int CategoryId);
+        Task<ServiceResponse<CategoryDto>> Add(CategoryDto newCategory);
+        Task<ServiceResponse<bool>> Update(int id, CategoryDto category);
+        Task<ServiceResponse<bool>> Delete(int categoryId);
     }
 
     #endregion
 
-    public class QCActionServices : IQCActionServices
+    public class CategoryServices : ICategoryServices
     {
         #region Private properties
 
@@ -27,7 +29,7 @@ namespace Server.Services
 
         #region Constructor
 
-        public QCActionServices(IUnitOfWork unitOfWork)
+        public CategoryServices(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -36,31 +38,31 @@ namespace Server.Services
 
         #region Methods
 
-        public async Task<ServiceResponse<QCAction>> Add(QCAction qcActionRequest)
+        public async Task<ServiceResponse<CategoryDto>> Add(CategoryDto request)
         {
             try
             {
-                if (qcActionRequest == null)
+                if (request == null)
                 {
-                    return new ServiceResponse<QCAction>
+                    return new ServiceResponse<CategoryDto>
                     {
                         Success = false,
-                        Message = $"Thiếu thông tin hành động khắc phục."
+                        Message = $"Thiếu thông tin loại test."
                     };
                 }
 
-                var newQCAction = new QCAction
+                var newCategory = new Category
                 {
-                    ActionName = qcActionRequest.ActionName
+                    CategoryName = request.CategoryName
                 };
 
-                await _unitOfWork.QCActionRepository.AddAsync(newQCAction);
+                await _unitOfWork.CategoryRepository.AddAsync(newCategory);
                 await _unitOfWork.CommitAsync();
 
-                return new ServiceResponse<QCAction>
+                return new ServiceResponse<CategoryDto>
                 {
                     Success = true,
-                    Data = newQCAction,
+                    Data = newCategory.ConvertToDto(),
                     Message = $"Đã thêm thành công!"
                 };
             }
@@ -73,11 +75,11 @@ namespace Server.Services
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng hành động khắc phục.";
+                        errorMessage = "Xảy ra lỗi do trùng loại test.";
                     }
                 }
 
-                return new ServiceResponse<QCAction>
+                return new ServiceResponse<CategoryDto>
                 {
                     Success = false,
                     Message = errorMessage
@@ -85,21 +87,21 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int qcActionIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int categoryIdRequest)
         {
             try
             {
-                var qCActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == qcActionIdRequest);
-                if (qCActionEntity == null)
+                var CategoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == categoryIdRequest);
+                if (CategoryEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Tìm không thấy hành động khắc phục cần xoá!"
+                        Message = $"Tìm không thấy loại test cần xoá!"
                     };
                 }
 
-                _unitOfWork.QCActionRepository.Remove(qCActionEntity);
+                _unitOfWork.CategoryRepository.Remove(CategoryEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -118,63 +120,64 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<QCAction>>> GetAll()
+        public async Task<ServiceResponse<IEnumerable<CategoryDto>>> GetAll()
         {
             try
             {
-                var qcActionList = await _unitOfWork.QCActionRepository.GetAllAsync();
-                return new ServiceResponse<IEnumerable<QCAction>>
+                var categoryList = await _unitOfWork.CategoryRepository.GetAllAsync();
+
+                return new ServiceResponse<IEnumerable<CategoryDto>>
                 {
                     Success = true,
-                    Data = qcActionList
+                    Data = categoryList.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<IEnumerable<QCAction>>
+                return new ServiceResponse<IEnumerable<CategoryDto>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách hành động khắc phục."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách loại test."
                 };
             }
         }
 
-        public async Task<ServiceResponse<QCAction?>> GetById(int qcActionIdRequest)
+        public async Task<ServiceResponse<CategoryDto?>> GetById(int categoryIdRequest)
         {
             try
             {
-                var qcActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == qcActionIdRequest);
-                if (qcActionEntity == null)
+                var categoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == categoryIdRequest);
+                if (categoryEntity == null)
                 {
-                    return new ServiceResponse<QCAction?>
+                    return new ServiceResponse<CategoryDto?>
                     {
                         Success = false,
-                        Message = $"Không có hành động khắc phục nào với Id = {qcActionIdRequest}."
+                        Message = $"Không có loại test nào với Id = {categoryIdRequest}."
                     };
                 }
 
-                return new ServiceResponse<QCAction?>
+                return new ServiceResponse<CategoryDto?>
                 {
                     Success = true,
-                    Data = qcActionEntity
+                    Data = categoryEntity.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<QCAction?>
+                return new ServiceResponse<CategoryDto?>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy hành động khắc phục."
+                    Message = $"Xảy ra lỗi trong quá trình lấy loại test."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, QCAction qcActionRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, CategoryDto categoryRequest)
         {
             try
             {
-                var qcActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == id);
-                if (qcActionEntity == null)
+                var categoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == id);
+                if (categoryEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
@@ -183,9 +186,9 @@ namespace Server.Services
                     };
                 }
 
-                qcActionEntity.ActionName = qcActionRequest.ActionName;
+                categoryEntity.CategoryName = categoryRequest.CategoryName;
 
-                _unitOfWork.QCActionRepository.Update(qcActionEntity);
+                _unitOfWork.CategoryRepository.Update(categoryEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -196,14 +199,14 @@ namespace Server.Services
             }
             catch (Exception ex)
             {
-                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật hành động khắc phục.";
+                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật loại test.";
 
                 if (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException)
                 {
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng hành động khắc phục.";
+                        errorMessage = "Xảy ra lỗi do trùng loại test.";
                     }
                 }
 

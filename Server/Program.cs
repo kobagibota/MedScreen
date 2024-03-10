@@ -21,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ILaboratoryServices, LaboratoryServices>();
 builder.Services.AddScoped<IQCActionServices, QCActionServices>();
+builder.Services.AddScoped<ICategoryServices, CategoryServices>();
 
 var app = builder.Build();
 

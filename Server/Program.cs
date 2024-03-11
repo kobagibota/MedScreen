@@ -19,9 +19,18 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn
 
 // Add application services.
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ILaboratoryServices, LaboratoryServices>();
-builder.Services.AddScoped<IQCActionServices, QCActionServices>();
-builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+builder.Services.AddScoped<ILaboratoryService, LaboratoryService>();
+builder.Services.AddScoped<IQCActionService, QCActionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IMethodService, MethodService>();
+builder.Services.AddScoped<IStandardService, StandardService>();
+builder.Services.AddScoped<IStrainGroupService, StrainGroupService>();
+builder.Services.AddScoped<IStrainService, StrainService>();
+builder.Services.AddScoped<ITestTypeService, TestTypeService>();
+builder.Services.AddScoped<ITestQCService, TestQCService>();
+builder.Services.AddScoped<ISupplyService, SupplyService>();
+builder.Services.AddScoped<ILotTestService, LotTestService>();
+
 
 var app = builder.Build();
 

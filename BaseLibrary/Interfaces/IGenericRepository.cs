@@ -5,13 +5,13 @@ namespace BaseLibrary.Interfaces
     public interface IGenericRepository<T> where T : class
     {
         IEnumerable<T> GetAll();
-        Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] include);
 
         IEnumerable<T> Find(Expression<Func<T, bool>> expression);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default);
         
         T Get(Expression<Func<T, bool>> expression);
-        Task<T> GetAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default);
+        Task<T> GetAsync(Expression<Func<T, bool>> expression, params Expression<Func<T, object>>[] include);
         
         Task AddAsync(T entity, CancellationToken cancellationToken = default);
         void Add(T entity);

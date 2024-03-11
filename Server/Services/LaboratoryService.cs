@@ -8,7 +8,7 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface ILaboratoryServices
+    public interface ILaboratoryService
     {
         Task<ServiceResponse<IEnumerable<Laboratory>>> GetAll();
         Task<ServiceResponse<Laboratory?>> GetById(int laboratoryId);
@@ -21,7 +21,7 @@ namespace Server.Services
 
     #endregion
 
-    public class LaboratoryServices : ILaboratoryServices
+    public class LaboratoryService : ILaboratoryService
     {
         #region Private properties
 
@@ -31,7 +31,7 @@ namespace Server.Services
         
         #region Constructor
 
-        public LaboratoryServices(IUnitOfWork unitOfWork)
+        public LaboratoryService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

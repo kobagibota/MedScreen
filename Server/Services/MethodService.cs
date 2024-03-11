@@ -1,4 +1,6 @@
-﻿using BaseLibrary.Entities;
+﻿using BaseLibrary.Dtos;
+using BaseLibrary.Entities;
+using BaseLibrary.Extentions;
 using BaseLibrary.Interfaces;
 using BaseLibrary.Respones;
 
@@ -6,18 +8,18 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface IQCActionServices
+    public interface IMethodService
     {
-        Task<ServiceResponse<IEnumerable<QCAction>>> GetAll();
-        Task<ServiceResponse<QCAction?>> GetById(int qcActionId);
-        Task<ServiceResponse<QCAction>> Add(QCAction newQCAction);
-        Task<ServiceResponse<bool>> Update(int id, QCAction qcAction);
-        Task<ServiceResponse<bool>> Delete(int qcActionId);
+        Task<ServiceResponse<IEnumerable<MethodDto>>> GetAll();
+        Task<ServiceResponse<MethodDto?>> GetById(int methodId);
+        Task<ServiceResponse<MethodDto>> Add(MethodDto newmethod);
+        Task<ServiceResponse<bool>> Update(int id, MethodDto methodDto);
+        Task<ServiceResponse<bool>> Delete(int methodId);
     }
 
     #endregion
 
-    public class QCActionServices : IQCActionServices
+    public class MethodService : IMethodService
     {
         #region Private properties
 
@@ -27,7 +29,7 @@ namespace Server.Services
 
         #region Constructor
 
-        public QCActionServices(IUnitOfWork unitOfWork)
+        public MethodService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -36,31 +38,31 @@ namespace Server.Services
 
         #region Methods
 
-        public async Task<ServiceResponse<QCAction>> Add(QCAction qcActionRequest)
+        public async Task<ServiceResponse<MethodDto>> Add(MethodDto request)
         {
             try
             {
-                if (qcActionRequest == null)
+                if (request == null)
                 {
-                    return new ServiceResponse<QCAction>
+                    return new ServiceResponse<MethodDto>
                     {
                         Success = false,
-                        Message = $"Thiếu thông tin hành động khắc phục."
+                        Message = $"Thiếu thông tin phương pháp."
                     };
                 }
 
-                var newQCAction = new QCAction
+                var newMethod = new Method
                 {
-                    ActionName = qcActionRequest.ActionName
+                    MethodName = request.MethodName
                 };
 
-                await _unitOfWork.QCActionRepository.AddAsync(newQCAction);
+                await _unitOfWork.MethodRepository.AddAsync(newMethod);
                 await _unitOfWork.CommitAsync();
 
-                return new ServiceResponse<QCAction>
+                return new ServiceResponse<MethodDto>
                 {
                     Success = true,
-                    Data = newQCAction,
+                    Data = newMethod.ConvertToDto(),
                     Message = $"Đã thêm thành công!"
                 };
             }
@@ -73,11 +75,11 @@ namespace Server.Services
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng hành động khắc phục.";
+                        errorMessage = "Xảy ra lỗi do trùng tên phương pháp.";
                     }
                 }
 
-                return new ServiceResponse<QCAction>
+                return new ServiceResponse<MethodDto>
                 {
                     Success = false,
                     Message = errorMessage
@@ -85,21 +87,21 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int qcActionIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int methodIdRequest)
         {
             try
             {
-                var qCActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == qcActionIdRequest);
-                if (qCActionEntity == null)
+                var methodEntity = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == methodIdRequest);
+                if (methodEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Tìm không thấy hành động khắc phục cần xoá!"
+                        Message = $"Tìm không thấy phương pháp cần xoá!"
                     };
                 }
 
-                _unitOfWork.QCActionRepository.Remove(qCActionEntity);
+                _unitOfWork.MethodRepository.Remove(methodEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -118,74 +120,75 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<QCAction>>> GetAll()
+        public async Task<ServiceResponse<IEnumerable<MethodDto>>> GetAll()
         {
             try
             {
-                var qcActionList = await _unitOfWork.QCActionRepository.GetAllAsync();
-                return new ServiceResponse<IEnumerable<QCAction>>
+                var methodList = await _unitOfWork.MethodRepository.GetAllAsync();
+
+                return new ServiceResponse<IEnumerable<MethodDto>>
                 {
                     Success = true,
-                    Data = qcActionList
+                    Data = methodList.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<IEnumerable<QCAction>>
+                return new ServiceResponse<IEnumerable<MethodDto>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách hành động khắc phục."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách phương pháp."
                 };
             }
         }
 
-        public async Task<ServiceResponse<QCAction?>> GetById(int qcActionIdRequest)
+        public async Task<ServiceResponse<MethodDto?>> GetById(int methodIdRequest)
         {
             try
             {
-                var qcActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == qcActionIdRequest);
-                if (qcActionEntity == null)
+                var methodEntity = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == methodIdRequest);
+                if (methodEntity == null)
                 {
-                    return new ServiceResponse<QCAction?>
+                    return new ServiceResponse<MethodDto?>
                     {
                         Success = false,
-                        Message = $"Không có hành động khắc phục nào với Id = {qcActionIdRequest}."
+                        Message = $"Không có phương pháp nào với Id = {methodIdRequest}."
                     };
                 }
 
-                return new ServiceResponse<QCAction?>
+                return new ServiceResponse<MethodDto?>
                 {
                     Success = true,
-                    Data = qcActionEntity
+                    Data = methodEntity.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<QCAction?>
+                return new ServiceResponse<MethodDto?>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy hành động khắc phục."
+                    Message = $"Xảy ra lỗi trong quá trình lấy phương pháp."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, QCAction qcActionRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, MethodDto categoryRequest)
         {
             try
             {
-                var qcActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == id);
-                if (qcActionEntity == null)
+                var methodEntity = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == id);
+                if (methodEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Không có phòng xét nghiệm nào với Id = {id}."
+                        Message = $"Không có phương pháp nào với Id = {id}."
                     };
                 }
 
-                qcActionEntity.ActionName = qcActionRequest.ActionName;
+                methodEntity.MethodName = categoryRequest.MethodName;
 
-                _unitOfWork.QCActionRepository.Update(qcActionEntity);
+                _unitOfWork.MethodRepository.Update(methodEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -196,14 +199,14 @@ namespace Server.Services
             }
             catch (Exception ex)
             {
-                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật hành động khắc phục.";
+                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật phương pháp.";
 
                 if (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException)
                 {
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng hành động khắc phục.";
+                        errorMessage = "Xảy ra lỗi do trùng phương pháp.";
                     }
                 }
 

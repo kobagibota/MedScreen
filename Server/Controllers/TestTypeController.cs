@@ -6,19 +6,19 @@ namespace Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class TestTypeController : ControllerBase
     {
         #region Private Members
 
-        private readonly ICategoryService _categoryService;
+        private readonly ITestTypeService _testTypeService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public CategoryController(ICategoryService categoryService)
+        public TestTypeController(ITestTypeService testTypeService)
         {
-            _categoryService = categoryService;
+            _testTypeService = testTypeService;
         }
 
         #endregion Constructor
@@ -28,23 +28,23 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var list = await _categoryService.GetAll();
-            return Ok(list);
+            var response = await _testTypeService.GetAll();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var item = await _categoryService.GetById(id);
+            var response = await _testTypeService.GetById(id);
 
-            if (item == null)
+            if (response == null)
                 return NotFound();
 
-            return Ok(item);
+            return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CategoryDto request)
+        public async Task<IActionResult> Create([FromBody] TestTypeDto request)
         {
             try
             {
@@ -53,14 +53,14 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var categoryResponse = await _categoryService.Add(request);
+                var response = await _testTypeService.Add(request);
 
-                if (categoryResponse.Success)
+                if (response.Success)
                 {
-                    return Ok(categoryResponse);
+                    return Ok(response);
                 }
 
-                return BadRequest(categoryResponse.Message);
+                return BadRequest(response.Message);
             }
             catch (Exception ex)
             {
@@ -70,7 +70,7 @@ namespace Server.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CategoryDto request)
+        public async Task<IActionResult> Update(int id, [FromBody] TestTypeDto request)
         {
             try
             {
@@ -79,12 +79,12 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var categoryResponse = await _categoryService.Update(id, request);
-                if (categoryResponse.Success)
+                var response = await _testTypeService.Update(id, request);
+                if (response.Success)
                 {
-                    return Ok(categoryResponse);
+                    return Ok(response);
                 }
-                return BadRequest(categoryResponse.Message);
+                return BadRequest(response.Message);
             }
             catch (Exception ex)
             {
@@ -98,14 +98,14 @@ namespace Server.Controllers
         {
             try
             {
-                var categoryResponse = await _categoryService.Delete(id);
+                var response = await _testTypeService.Delete(id);
 
-                if (!categoryResponse.Success)
+                if (!response.Success)
                 {
-                    return BadRequest(categoryResponse.Message);
+                    return BadRequest(response.Message);
                 }
 
-                return Ok(categoryResponse);
+                return Ok(response);
             }
             catch (Exception ex)
             {

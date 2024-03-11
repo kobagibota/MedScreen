@@ -4,6 +4,7 @@
     {
         public int SupplyId { get; set; }
         public int QCProfileId { get; set; }
+        public int? SortOrder { get; set; }
         public bool InUse { get; set; }
 
         public virtual required Supply Supply { get; set; }

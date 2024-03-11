@@ -4,7 +4,6 @@
     {
         public int Id { get; set; }
         public int MethodId { get; set; }
-        public int? SortOrder { get; set; }
         public required string SupplyName { get; set; }
 
         public virtual required Method Method { get; set; }

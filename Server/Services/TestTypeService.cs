@@ -8,18 +8,18 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface ICategoryServices
+    public interface ITestTypeService
     {
-        Task<ServiceResponse<IEnumerable<CategoryDto>>> GetAll();
-        Task<ServiceResponse<CategoryDto?>> GetById(int CategoryId);
-        Task<ServiceResponse<CategoryDto>> Add(CategoryDto newCategory);
-        Task<ServiceResponse<bool>> Update(int id, CategoryDto category);
-        Task<ServiceResponse<bool>> Delete(int categoryId);
+        Task<ServiceResponse<IEnumerable<TestTypeDto>>> GetAll();
+        Task<ServiceResponse<TestTypeDto?>> GetById(int testTypeId);
+        Task<ServiceResponse<TestTypeDto>> Add(TestTypeDto newTestType);
+        Task<ServiceResponse<bool>> Update(int id, TestTypeDto testTypeDto);
+        Task<ServiceResponse<bool>> Delete(int testTypeId);
     }
 
     #endregion
 
-    public class CategoryServices : ICategoryServices
+    public class TestTypeService : ITestTypeService
     {
         #region Private properties
 
@@ -29,40 +29,41 @@ namespace Server.Services
 
         #region Constructor
 
-        public CategoryServices(IUnitOfWork unitOfWork)
+        public TestTypeService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
         #endregion
 
-        #region Methods
+        #region TestTypes
 
-        public async Task<ServiceResponse<CategoryDto>> Add(CategoryDto request)
+        public async Task<ServiceResponse<TestTypeDto>> Add(TestTypeDto request)
         {
             try
             {
                 if (request == null)
                 {
-                    return new ServiceResponse<CategoryDto>
+                    return new ServiceResponse<TestTypeDto>
                     {
                         Success = false,
-                        Message = $"Thiếu thông tin loại test."
+                        Message = $"Thiếu thông tin loại thuốc thử."
                     };
                 }
 
-                var newCategory = new Category
+                var newTestType = new TestType
                 {
-                    CategoryName = request.CategoryName
+                    TypeName = request.TypeName,
+                    Unit = request.Unit
                 };
 
-                await _unitOfWork.CategoryRepository.AddAsync(newCategory);
+                await _unitOfWork.TestTypeRepository.AddAsync(newTestType);
                 await _unitOfWork.CommitAsync();
 
-                return new ServiceResponse<CategoryDto>
+                return new ServiceResponse<TestTypeDto>
                 {
                     Success = true,
-                    Data = newCategory.ConvertToDto(),
+                    Data = newTestType.ConvertToDto(),
                     Message = $"Đã thêm thành công!"
                 };
             }
@@ -75,11 +76,11 @@ namespace Server.Services
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng loại test.";
+                        errorMessage = "Xảy ra lỗi do trùng tên loại thuốc thử.";
                     }
                 }
 
-                return new ServiceResponse<CategoryDto>
+                return new ServiceResponse<TestTypeDto>
                 {
                     Success = false,
                     Message = errorMessage
@@ -87,21 +88,21 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int categoryIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int testTypeIdRequest)
         {
             try
             {
-                var CategoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == categoryIdRequest);
-                if (CategoryEntity == null)
+                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == testTypeIdRequest);
+                if (testTypeEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Tìm không thấy loại test cần xoá!"
+                        Message = $"Tìm không thấy loại thuốc thử cần xoá!"
                     };
                 }
 
-                _unitOfWork.CategoryRepository.Remove(CategoryEntity);
+                _unitOfWork.TestTypeRepository.Remove(testTypeEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -120,75 +121,76 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<CategoryDto>>> GetAll()
+        public async Task<ServiceResponse<IEnumerable<TestTypeDto>>> GetAll()
         {
             try
             {
-                var categoryList = await _unitOfWork.CategoryRepository.GetAllAsync();
+                var testTypeList = await _unitOfWork.TestTypeRepository.GetAllAsync();
 
-                return new ServiceResponse<IEnumerable<CategoryDto>>
+                return new ServiceResponse<IEnumerable<TestTypeDto>>
                 {
                     Success = true,
-                    Data = categoryList.ConvertToDto()
+                    Data = testTypeList.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<IEnumerable<CategoryDto>>
+                return new ServiceResponse<IEnumerable<TestTypeDto>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách loại test."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách loại thuốc thử."
                 };
             }
         }
 
-        public async Task<ServiceResponse<CategoryDto?>> GetById(int categoryIdRequest)
+        public async Task<ServiceResponse<TestTypeDto?>> GetById(int testTypeIdRequest)
         {
             try
             {
-                var categoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == categoryIdRequest);
-                if (categoryEntity == null)
+                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == testTypeIdRequest);
+                if (testTypeEntity == null)
                 {
-                    return new ServiceResponse<CategoryDto?>
+                    return new ServiceResponse<TestTypeDto?>
                     {
                         Success = false,
-                        Message = $"Không có loại test nào với Id = {categoryIdRequest}."
+                        Message = $"Không có loại thuốc thử nào với Id = {testTypeIdRequest}."
                     };
                 }
 
-                return new ServiceResponse<CategoryDto?>
+                return new ServiceResponse<TestTypeDto?>
                 {
                     Success = true,
-                    Data = categoryEntity.ConvertToDto()
+                    Data = testTypeEntity.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<CategoryDto?>
+                return new ServiceResponse<TestTypeDto?>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy loại test."
+                    Message = $"Xảy ra lỗi trong quá trình lấy loại thuốc thử."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, CategoryDto categoryRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, TestTypeDto categoryRequest)
         {
             try
             {
-                var categoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == id);
-                if (categoryEntity == null)
+                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == id);
+                if (testTypeEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Không có phòng xét nghiệm nào với Id = {id}."
+                        Message = $"Không có loại thuốc thử nào với Id = {id}."
                     };
                 }
 
-                categoryEntity.CategoryName = categoryRequest.CategoryName;
+                testTypeEntity.TypeName = categoryRequest.TypeName;
+                testTypeEntity.Unit = categoryRequest.Unit;
 
-                _unitOfWork.CategoryRepository.Update(categoryEntity);
+                _unitOfWork.TestTypeRepository.Update(testTypeEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -199,14 +201,14 @@ namespace Server.Services
             }
             catch (Exception ex)
             {
-                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật loại test.";
+                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật loại thuốc thử.";
 
                 if (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException)
                 {
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng loại test.";
+                        errorMessage = "Xảy ra lỗi do trùng tên loại thuốc thử.";
                     }
                 }
 

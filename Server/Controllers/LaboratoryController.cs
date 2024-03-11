@@ -11,15 +11,15 @@ namespace Server.Controllers
     {
         #region Private Members
 
-        private readonly ILaboratoryServices _laboratoryServices;
+        private readonly ILaboratoryService _laboratoryService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public LaboratoryController(ILaboratoryServices laboratoryServices)
+        public LaboratoryController(ILaboratoryService laboratoryService)
         {
-            _laboratoryServices = laboratoryServices;
+            _laboratoryService = laboratoryService;
         }
 
         #endregion Constructor
@@ -29,14 +29,14 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var lab = await _laboratoryServices.GetAll();
+            var lab = await _laboratoryService.GetAll();
             return Ok(lab);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var item = await _laboratoryServices.GetById(id);
+            var item = await _laboratoryService.GetById(id);
 
             if (item == null)
                 return NotFound();
@@ -54,7 +54,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var labResponse = await _laboratoryServices.Add(request);
+                var labResponse = await _laboratoryService.Add(request);
 
                 if (labResponse.Success)
                 {
@@ -80,7 +80,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var labResponse = await _laboratoryServices.Update(id, request);
+                var labResponse = await _laboratoryService.Update(id, request);
                 if (labResponse.Success)
                 {
                     return Ok(labResponse);
@@ -99,7 +99,7 @@ namespace Server.Controllers
         {
             try
             {
-                var labResponse = await _laboratoryServices.ChangeStatus(id, status);
+                var labResponse = await _laboratoryService.ChangeStatus(id, status);
                 if (labResponse.Success)
                 {
                     return Ok(labResponse);
@@ -118,7 +118,7 @@ namespace Server.Controllers
         {
             try
             {
-                var labResponse = await _laboratoryServices.Delete(id);
+                var labResponse = await _laboratoryService.Delete(id);
 
                 if (!labResponse.Success)
                 {

@@ -10,15 +10,15 @@ namespace Server.Controllers
     {
         #region Private Members
 
-        private readonly IQCActionServices _qcActionServices;
+        private readonly IQCActionService _qcActionService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public QCActionController(IQCActionServices qcActionServices)
+        public QCActionController(IQCActionService qcActionService)
         {
-            _qcActionServices = qcActionServices;
+            _qcActionService = qcActionService;
         }
 
         #endregion Constructor
@@ -28,14 +28,14 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var qcAction = await _qcActionServices.GetAll();
+            var qcAction = await _qcActionService.GetAll();
             return Ok(qcAction);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var item = await _qcActionServices.GetById(id);
+            var item = await _qcActionService.GetById(id);
 
             if (item == null)
                 return NotFound();
@@ -53,7 +53,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var qcActionResponse = await _qcActionServices.Add(request);
+                var qcActionResponse = await _qcActionService.Add(request);
 
                 if (qcActionResponse.Success)
                 {
@@ -79,7 +79,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var qcActionResponse = await _qcActionServices.Update(id, request);
+                var qcActionResponse = await _qcActionService.Update(id, request);
                 if (qcActionResponse.Success)
                 {
                     return Ok(qcActionResponse);
@@ -98,7 +98,7 @@ namespace Server.Controllers
         {
             try
             {
-                var qcActionResponse = await _qcActionServices.Delete(id);
+                var qcActionResponse = await _qcActionService.Delete(id);
 
                 if (!qcActionResponse.Success)
                 {

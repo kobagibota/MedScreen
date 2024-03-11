@@ -42,9 +42,19 @@ namespace ServerLibrary.Repositories
             return result;
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, params Expression<Func<T, object>>[] includes)
         {
-            return await _entitySet.FirstOrDefaultAsync(expression, cancellationToken);
+            IQueryable<T> items = _entitySet;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    items = items.Include(include);
+                }
+            }
+
+            return await items.SingleOrDefaultAsync(expression);
         }
 
         public IEnumerable<T> GetAll()
@@ -52,9 +62,19 @@ namespace ServerLibrary.Repositories
             return _entitySet.AsEnumerable();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return await _entitySet.ToListAsync(cancellationToken);
+            IQueryable<T> items = _entitySet;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    items = items.Include(include);
+                }
+            }
+
+            return await items.ToListAsync();
         }
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> expression)

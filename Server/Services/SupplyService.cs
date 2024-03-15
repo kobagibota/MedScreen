@@ -42,7 +42,7 @@ namespace Server.Services
         {
             try
             {
-                var method = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == request.MethodId);
+                var method = await _unitOfWork.MethodRepository.GetBy(x => x.Id == request.MethodId);
                 if (request == null || method == null)
                 {
                     return new ServiceResponse<SupplyDto>
@@ -59,7 +59,7 @@ namespace Server.Services
                     Method = method
                 };
 
-                await _unitOfWork.SupplyRepository.AddAsync(newSupply);
+                await _unitOfWork.SupplyRepository.Add(newSupply);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<SupplyDto>
@@ -90,11 +90,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int supplyIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int supplyId)
         {
             try
             {
-                var supplyEntity = await _unitOfWork.SupplyRepository.GetAsync(x => x.Id == supplyIdRequest);
+                var supplyEntity = await _unitOfWork.SupplyRepository.GetBy(x => x.Id == supplyId);
                 if (supplyEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -127,7 +127,7 @@ namespace Server.Services
         {
             try
             {
-                var supplyList = await _unitOfWork.SupplyRepository.GetAllAsync(x => x.Method);
+                var supplyList = await _unitOfWork.SupplyRepository.GetAll(x => x.Method);
 
                 return new ServiceResponse<IEnumerable<SupplyDto>>
                 {
@@ -145,17 +145,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<SupplyDto?>> GetById(int supplyIdRequest)
+        public async Task<ServiceResponse<SupplyDto?>> GetById(int supplyId)
         {
             try
             {
-                var supplyEntity = await _unitOfWork.SupplyRepository.GetAsync(x => x.Id == supplyIdRequest, i => i.Method);
+                var supplyEntity = await _unitOfWork.SupplyRepository.GetBy(x => x.Id == supplyId, i => i.Method);
                 if (supplyEntity == null)
                 {
                     return new ServiceResponse<SupplyDto?>
                     {
                         Success = false,
-                        Message = $"Không có hoá chất phụ nào với Id = {supplyIdRequest}."
+                        Message = $"Không có hoá chất phụ nào với Id = {supplyId}."
                     };
                 }
 
@@ -179,7 +179,7 @@ namespace Server.Services
         {
             try
             {
-                var supplyEntity = await _unitOfWork.SupplyRepository.GetAsync(x => x.Id == id);
+                var supplyEntity = await _unitOfWork.SupplyRepository.GetBy(x => x.Id == id);
                 if (supplyEntity == null)
                 {
                     return new ServiceResponse<bool>

@@ -36,7 +36,7 @@ namespace Server.Services
 
         #endregion
 
-        #region TestTypes
+        #region Methods
 
         public async Task<ServiceResponse<TestTypeDto>> Add(TestTypeDto request)
         {
@@ -57,7 +57,7 @@ namespace Server.Services
                     Unit = request.Unit
                 };
 
-                await _unitOfWork.TestTypeRepository.AddAsync(newTestType);
+                await _unitOfWork.TestTypeRepository.Add(newTestType);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<TestTypeDto>
@@ -88,11 +88,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int testTypeIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int testTypeId)
         {
             try
             {
-                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == testTypeIdRequest);
+                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetBy(x => x.Id == testTypeId);
                 if (testTypeEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -125,7 +125,7 @@ namespace Server.Services
         {
             try
             {
-                var testTypeList = await _unitOfWork.TestTypeRepository.GetAllAsync();
+                var testTypeList = await _unitOfWork.TestTypeRepository.GetAll();
 
                 return new ServiceResponse<IEnumerable<TestTypeDto>>
                 {
@@ -143,17 +143,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<TestTypeDto?>> GetById(int testTypeIdRequest)
+        public async Task<ServiceResponse<TestTypeDto?>> GetById(int testTypeId)
         {
             try
             {
-                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == testTypeIdRequest);
+                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetBy(x => x.Id == testTypeId);
                 if (testTypeEntity == null)
                 {
                     return new ServiceResponse<TestTypeDto?>
                     {
                         Success = false,
-                        Message = $"Không có loại thuốc thử nào với Id = {testTypeIdRequest}."
+                        Message = $"Không có loại thuốc thử nào với Id = {testTypeId}."
                     };
                 }
 
@@ -173,11 +173,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, TestTypeDto categoryRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, TestTypeDto request)
         {
             try
             {
-                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == id);
+                var testTypeEntity = await _unitOfWork.TestTypeRepository.GetBy(x => x.Id == id);
                 if (testTypeEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -187,8 +187,8 @@ namespace Server.Services
                     };
                 }
 
-                testTypeEntity.TypeName = categoryRequest.TypeName;
-                testTypeEntity.Unit = categoryRequest.Unit;
+                testTypeEntity.TypeName = request.TypeName;
+                testTypeEntity.Unit = request.Unit;
 
                 _unitOfWork.TestTypeRepository.Update(testTypeEntity);
                 await _unitOfWork.CommitAsync();

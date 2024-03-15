@@ -9,7 +9,8 @@ namespace ServerLibrary.Configurations
         public void Configure(EntityTypeBuilder<QCProfileDetail> builder)
         {
             builder.ToTable("QCProfileDetails");
-            builder.HasKey(x => new { x.QCProfileId, x.StandardDetailId });
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.QCProfileId).IsRequired();
             builder.Property(x => x.StandardDetailId).IsRequired();

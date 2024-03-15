@@ -36,11 +36,11 @@ namespace Server.Services
 
         #region Methods
 
-        public async Task<ServiceResponse<QCAction>> Add(QCAction qcActionRequest)
+        public async Task<ServiceResponse<QCAction>> Add(QCAction request)
         {
             try
             {
-                if (qcActionRequest == null)
+                if (request == null)
                 {
                     return new ServiceResponse<QCAction>
                     {
@@ -51,10 +51,10 @@ namespace Server.Services
 
                 var newQCAction = new QCAction
                 {
-                    ActionName = qcActionRequest.ActionName
+                    ActionName = request.ActionName
                 };
 
-                await _unitOfWork.QCActionRepository.AddAsync(newQCAction);
+                await _unitOfWork.QCActionRepository.Add(newQCAction);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<QCAction>
@@ -85,11 +85,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int qcActionIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int qcActionId)
         {
             try
             {
-                var qCActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == qcActionIdRequest);
+                var qCActionEntity = await _unitOfWork.QCActionRepository.GetBy(x => x.Id == qcActionId);
                 if (qCActionEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -122,7 +122,7 @@ namespace Server.Services
         {
             try
             {
-                var qcActionList = await _unitOfWork.QCActionRepository.GetAllAsync();
+                var qcActionList = await _unitOfWork.QCActionRepository.GetAll();
                 return new ServiceResponse<IEnumerable<QCAction>>
                 {
                     Success = true,
@@ -139,17 +139,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<QCAction?>> GetById(int qcActionIdRequest)
+        public async Task<ServiceResponse<QCAction?>> GetById(int qcActionId)
         {
             try
             {
-                var qcActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == qcActionIdRequest);
+                var qcActionEntity = await _unitOfWork.QCActionRepository.GetBy(x => x.Id == qcActionId);
                 if (qcActionEntity == null)
                 {
                     return new ServiceResponse<QCAction?>
                     {
                         Success = false,
-                        Message = $"Không có hành động khắc phục nào với Id = {qcActionIdRequest}."
+                        Message = $"Không có hành động khắc phục nào với Id = {qcActionId}."
                     };
                 }
 
@@ -169,11 +169,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, QCAction qcActionRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, QCAction request)
         {
             try
             {
-                var qcActionEntity = await _unitOfWork.QCActionRepository.GetAsync(x => x.Id == id);
+                var qcActionEntity = await _unitOfWork.QCActionRepository.GetBy(x => x.Id == id);
                 if (qcActionEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -183,7 +183,7 @@ namespace Server.Services
                     };
                 }
 
-                qcActionEntity.ActionName = qcActionRequest.ActionName;
+                qcActionEntity.ActionName = request.ActionName;
 
                 _unitOfWork.QCActionRepository.Update(qcActionEntity);
                 await _unitOfWork.CommitAsync();

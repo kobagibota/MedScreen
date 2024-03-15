@@ -63,7 +63,7 @@ namespace Server.Services
                     Logo = newLaboratory.Logo
                 };
 
-                await _unitOfWork.LaboratoryRepository.AddAsync(newLab);
+                await _unitOfWork.LaboratoryRepository.Add(newLab);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<Laboratory>
@@ -99,7 +99,7 @@ namespace Server.Services
         {
             try
             {
-                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == id);
+                var lab = await _unitOfWork.LaboratoryRepository.GetBy(x => x.Id == id);
                 if (lab == null)
                 {
                     return new ServiceResponse<bool>
@@ -134,7 +134,7 @@ namespace Server.Services
         {
             try
             {
-                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == laboratoryId);
+                var lab = await _unitOfWork.LaboratoryRepository.GetBy(x => x.Id == laboratoryId);
                 if (lab == null)
                 {
                     return new ServiceResponse<bool>
@@ -168,7 +168,7 @@ namespace Server.Services
         {
             try
             {
-                var labList = await _unitOfWork.LaboratoryRepository.GetAllAsync();
+                var labList = await _unitOfWork.LaboratoryRepository.GetAll();
                 return new ServiceResponse<IEnumerable<Laboratory>>
                 {
                     Success = true,
@@ -189,7 +189,7 @@ namespace Server.Services
         {
             try
             {
-                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == laboratoryId);
+                var lab = await _unitOfWork.LaboratoryRepository.GetBy(x => x.Id == laboratoryId);
                 if (lab == null)
                 {
                     return new ServiceResponse<Laboratory?>
@@ -219,7 +219,7 @@ namespace Server.Services
         {
             try
             {
-                var lab = await _unitOfWork.LaboratoryRepository.GetAsync(x => x.Id == id);
+                var lab = await _unitOfWork.LaboratoryRepository.GetBy(x => x.Id == id);
                 if (lab == null)
                 {
                     return new ServiceResponse<bool>

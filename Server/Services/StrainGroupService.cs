@@ -36,7 +36,7 @@ namespace Server.Services
 
         #endregion
 
-        #region StrainGroups
+        #region Methods
 
         public async Task<ServiceResponse<StrainGroupDto>> Add(StrainGroupDto request)
         {
@@ -56,7 +56,7 @@ namespace Server.Services
                     GroupName = request.GroupName
                 };
 
-                await _unitOfWork.StrainGroupRepository.AddAsync(newStrainGroup);
+                await _unitOfWork.StrainGroupRepository.Add(newStrainGroup);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<StrainGroupDto>
@@ -87,11 +87,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int strainGroupIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int strainGroupId)
         {
             try
             {
-                var strainGroupEntity = await _unitOfWork.StrainGroupRepository.GetAsync(x => x.Id == strainGroupIdRequest);
+                var strainGroupEntity = await _unitOfWork.StrainGroupRepository.GetBy(x => x.Id == strainGroupId);
                 if (strainGroupEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -124,7 +124,7 @@ namespace Server.Services
         {
             try
             {
-                var strainGroupList = await _unitOfWork.StrainGroupRepository.GetAllAsync();
+                var strainGroupList = await _unitOfWork.StrainGroupRepository.GetAll();
 
                 return new ServiceResponse<IEnumerable<StrainGroupDto>>
                 {
@@ -142,17 +142,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<StrainGroupDto?>> GetById(int strainGroupIdRequest)
+        public async Task<ServiceResponse<StrainGroupDto?>> GetById(int strainGroupId)
         {
             try
             {
-                var strainGroupEntity = await _unitOfWork.StrainGroupRepository.GetAsync(x => x.Id == strainGroupIdRequest);
+                var strainGroupEntity = await _unitOfWork.StrainGroupRepository.GetBy(x => x.Id == strainGroupId);
                 if (strainGroupEntity == null)
                 {
                     return new ServiceResponse<StrainGroupDto?>
                     {
                         Success = false,
-                        Message = $"Không có nhóm chủng nào với Id = {strainGroupIdRequest}."
+                        Message = $"Không có nhóm chủng nào với Id = {strainGroupId}."
                     };
                 }
 
@@ -172,11 +172,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, StrainGroupDto categoryRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, StrainGroupDto request)
         {
             try
             {
-                var strainGroupEntity = await _unitOfWork.StrainGroupRepository.GetAsync(x => x.Id == id);
+                var strainGroupEntity = await _unitOfWork.StrainGroupRepository.GetBy(x => x.Id == id);
                 if (strainGroupEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -186,7 +186,7 @@ namespace Server.Services
                     };
                 }
 
-                strainGroupEntity.GroupName = categoryRequest.GroupName;
+                strainGroupEntity.GroupName = request.GroupName;
 
                 _unitOfWork.StrainGroupRepository.Update(strainGroupEntity);
                 await _unitOfWork.CommitAsync();

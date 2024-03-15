@@ -56,7 +56,7 @@ namespace Server.Services
                     CategoryName = request.CategoryName
                 };
 
-                await _unitOfWork.CategoryRepository.AddAsync(newCategory);
+                await _unitOfWork.CategoryRepository.Add(newCategory);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<CategoryDto>
@@ -87,12 +87,12 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int categoryIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int categoryId)
         {
             try
             {
-                var CategoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == categoryIdRequest);
-                if (CategoryEntity == null)
+                var categoryEntity = await _unitOfWork.CategoryRepository.GetBy(x => x.Id == categoryId);
+                if (categoryEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
@@ -101,7 +101,7 @@ namespace Server.Services
                     };
                 }
 
-                _unitOfWork.CategoryRepository.Remove(CategoryEntity);
+                _unitOfWork.CategoryRepository.Remove(categoryEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -124,7 +124,7 @@ namespace Server.Services
         {
             try
             {
-                var categoryList = await _unitOfWork.CategoryRepository.GetAllAsync();
+                var categoryList = await _unitOfWork.CategoryRepository.GetAll();
 
                 return new ServiceResponse<IEnumerable<CategoryDto>>
                 {
@@ -142,17 +142,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<CategoryDto?>> GetById(int categoryIdRequest)
+        public async Task<ServiceResponse<CategoryDto?>> GetById(int categoryId)
         {
             try
             {
-                var categoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == categoryIdRequest);
+                var categoryEntity = await _unitOfWork.CategoryRepository.GetBy(x => x.Id == categoryId);
                 if (categoryEntity == null)
                 {
                     return new ServiceResponse<CategoryDto?>
                     {
                         Success = false,
-                        Message = $"Không có loại test nào với Id = {categoryIdRequest}."
+                        Message = $"Không có loại test nào với Id = {categoryId}."
                     };
                 }
 
@@ -176,7 +176,7 @@ namespace Server.Services
         {
             try
             {
-                var categoryEntity = await _unitOfWork.CategoryRepository.GetAsync(x => x.Id == id);
+                var categoryEntity = await _unitOfWork.CategoryRepository.GetBy(x => x.Id == id);
                 if (categoryEntity == null)
                 {
                     return new ServiceResponse<bool>

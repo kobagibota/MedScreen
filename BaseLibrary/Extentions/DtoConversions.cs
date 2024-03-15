@@ -82,21 +82,25 @@ namespace BaseLibrary.Extentions
 
         #region Strain
 
-        public static StrainDto ConvertToDto(this Strain strain)
+        public static StrainDto ConvertToDto(this Strain strain, List<StrainType> strainTypes)
         {
             var strainDto = new StrainDto()
             {
                 Id = strain.Id,
-                StrainName = strain.StrainName,
                 GroupId = strain.GroupId,
-                GroupName = strain.StrainGroup?.GroupName
+                GroupName = strain.StrainGroup.GroupName,
+                StrainName = strain.StrainName,
+                TypeTest = strainTypes.FirstOrDefault(st => st.StrainId == strain.Id && st.CategoryId == 1)?.InUse == true,
+                TypeID = strainTypes.FirstOrDefault(st => st.StrainId == strain.Id && st.CategoryId == 2)?.InUse == true,
+                TypeAST = strainTypes.FirstOrDefault(st => st.StrainId == strain.Id && st.CategoryId == 3)?.InUse == true
             };
             return strainDto;
         }
 
-        public static IEnumerable<StrainDto> ConvertToDto(this IEnumerable<Strain> strains)
+
+        public static IEnumerable<StrainDto> ConvertToDto(this IEnumerable<Strain> strains, List<StrainType> strainTypes)
         {
-            return strains.Select(ConvertToDto);
+            return strains.Select(strain => strain.ConvertToDto(strainTypes));
         }
 
         #endregion
@@ -182,6 +186,53 @@ namespace BaseLibrary.Extentions
         public static IEnumerable<LotTestDto> ConvertToDto(this IEnumerable<LotTest> lotTests)
         {
             return lotTests.Select(ConvertToDto);
+        }
+
+        #endregion
+
+        #region LotSupply
+
+        public static LotSupplyDto ConvertToDto(this LotSupply lotSupply)
+        {
+            var supplyDto = new LotSupplyDto()
+            {
+                Id = lotSupply.Id,
+                LotNumber = lotSupply.LotNumber,
+                ExpDate = lotSupply.ExpDate,
+                Default = lotSupply.Default,
+                SupplyId = lotSupply.SupplyId,
+                SupplyName = lotSupply.Supply.SupplyName
+            };
+            return supplyDto;
+        }
+
+        public static IEnumerable<LotSupplyDto> ConvertToDto(this IEnumerable<LotSupply> lotSupplies)
+        {
+            return lotSupplies.Select(ConvertToDto);
+        }
+
+        #endregion
+
+        #region StrainType
+
+        public static StrainTypeDto ConvertToDto(this StrainType strainType)
+        {
+            var strainTypeDto = new StrainTypeDto()
+            {
+                Id = strainType.Id,
+                StrainId = strainType.StrainId,
+                CategoryId = strainType.CategoryId,
+                StrainName = strainType.Strain.StrainName,
+                CategoryName = strainType.Category.CategoryName,
+                InUse = strainType.InUse
+            };
+            return strainTypeDto;
+        }
+
+
+        public static IEnumerable<StrainTypeDto> ConvertToDto(this IEnumerable<StrainType> strainTypes)
+        {
+            return strainTypes.Select(ConvertToDto);
         }
 
         #endregion

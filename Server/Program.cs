@@ -30,6 +30,8 @@ builder.Services.AddScoped<ITestTypeService, TestTypeService>();
 builder.Services.AddScoped<ITestQCService, TestQCService>();
 builder.Services.AddScoped<ISupplyService, SupplyService>();
 builder.Services.AddScoped<ILotTestService, LotTestService>();
+builder.Services.AddScoped<ILotSupplyService, LotSupplyService>();
+builder.Services.AddScoped<IStrainTypeService, StrainTypeService>();
 
 
 var app = builder.Build();

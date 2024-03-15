@@ -8,20 +8,20 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface ILotTestService
+    public interface ILotSupplyService
     {
-        Task<ServiceResponse<IEnumerable<LotTestDto>>> GetAll();
-        Task<ServiceResponse<LotTestDto?>> GetById(int lotTestId);
-        Task<ServiceResponse<LotTestDto>> Add(LotTestDto newLotTest);
-        Task<ServiceResponse<bool>> Update(int id, LotTestDto lotTestDto);
-        Task<ServiceResponse<bool>> Delete(int lotTestId);
+        Task<ServiceResponse<IEnumerable<LotSupplyDto>>> GetAll();
+        Task<ServiceResponse<LotSupplyDto?>> GetById(int lotSupplyId);
+        Task<ServiceResponse<LotSupplyDto>> Add(LotSupplyDto newLotSupply);
+        Task<ServiceResponse<bool>> Update(int id, LotSupplyDto lotSupplyDto);
+        Task<ServiceResponse<bool>> Delete(int lotSupplyId);
 
-        Task<ServiceResponse<bool>> SetDefault(int lotTestId);
+        Task<ServiceResponse<bool>> SetDefault(int lotSupplyId);
     }
 
     #endregion
 
-    public class LotTestService: ILotTestService
+    public class LotSupplyService: ILotSupplyService
     {
         #region Private properties
 
@@ -31,7 +31,7 @@ namespace Server.Services
 
         #region Constructor
 
-        public LotTestService(IUnitOfWork unitOfWork)
+        public LotSupplyService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -40,35 +40,35 @@ namespace Server.Services
 
         #region Methods
 
-        public async Task<ServiceResponse<LotTestDto>> Add(LotTestDto request)
+        public async Task<ServiceResponse<LotSupplyDto>> Add(LotSupplyDto request)
         {
             try
             {
-                var testQC = await _unitOfWork.TestQCRepository.GetBy(x => x.Id == request.TestQCId);
-                if (request == null || testQC == null)
+                var supply = await _unitOfWork.SupplyRepository.GetBy(x => x.Id == request.SupplyId);
+                if (request == null || supply == null)
                 {
-                    return new ServiceResponse<LotTestDto>
+                    return new ServiceResponse<LotSupplyDto>
                     {
                         Success = false,
-                        Message = $"Thiếu thông tin lô hoá chất."
+                        Message = $"Thiếu thông tin lô hoá chất phụ."
                     };
                 }
 
-                var newLotTest = new LotTest
+                var newLotSupply = new LotSupply
                 {
                     LotNumber = request.LotNumber,
                     ExpDate = request.ExpDate,
-                    TestQCId= request.TestQCId,
-                    TestQC = testQC
+                    SupplyId= request.SupplyId,
+                    Supply = supply
                 };
 
-                await _unitOfWork.LotTestRepository.Add(newLotTest);
+                await _unitOfWork.LotSupplyRepository.Add(newLotSupply);
                 await _unitOfWork.CommitAsync();
 
-                return new ServiceResponse<LotTestDto>
+                return new ServiceResponse<LotSupplyDto>
                 {
                     Success = true,
-                    Data = newLotTest.ConvertToDto(),
+                    Data = newLotSupply.ConvertToDto(),
                     Message = $"Đã thêm thành công!"
                 };
             }
@@ -81,11 +81,11 @@ namespace Server.Services
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng số lô hoá chất.";
+                        errorMessage = "Xảy ra lỗi do trùng số lô hoá chất phụ.";
                     }
                 }
 
-                return new ServiceResponse<LotTestDto>
+                return new ServiceResponse<LotSupplyDto>
                 {
                     Success = false,
                     Message = errorMessage
@@ -93,21 +93,21 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int lotTestId)
+        public async Task<ServiceResponse<bool>> Delete(int lotSupplyIdRequest)
         {
             try
             {
-                var lotTestEntity = await _unitOfWork.LotTestRepository.GetBy(x => x.Id == lotTestId);
-                if (lotTestEntity == null)
+                var lotSupplyEntity = await _unitOfWork.LotSupplyRepository.GetBy(x => x.Id == lotSupplyIdRequest);
+                if (lotSupplyEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Tìm không thấy lô hoá chất cần xoá!"
+                        Message = $"Tìm không thấy lô hoá chất phụ cần xoá!"
                     };
                 }
 
-                _unitOfWork.LotTestRepository.Remove(lotTestEntity);
+                _unitOfWork.LotSupplyRepository.Remove(lotSupplyEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -126,77 +126,77 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<LotTestDto>>> GetAll()
+        public async Task<ServiceResponse<IEnumerable<LotSupplyDto>>> GetAll()
         {
             try
             {
-                var lotTestList = await _unitOfWork.LotTestRepository.GetAll(x => x.TestQC);
+                var lotSupplyList = await _unitOfWork.LotSupplyRepository.GetAll(x => x.Supply);
 
-                return new ServiceResponse<IEnumerable<LotTestDto>>
+                return new ServiceResponse<IEnumerable<LotSupplyDto>>
                 {
                     Success = true,
-                    Data = lotTestList.ConvertToDto()
+                    Data = lotSupplyList.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<IEnumerable<LotTestDto>>
+                return new ServiceResponse<IEnumerable<LotSupplyDto>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách lô hoá chất."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách lô hoá chất phụ."
                 };
             }
         }
 
-        public async Task<ServiceResponse<LotTestDto?>> GetById(int lotTestId)
+        public async Task<ServiceResponse<LotSupplyDto?>> GetById(int lotSupplyId)
         {
             try
             {
-                var lotTestEntity = await _unitOfWork.LotTestRepository.GetBy(x => x.Id == lotTestId, i => i.TestQC);
-                if (lotTestEntity == null)
+                var lotSupplyEntity = await _unitOfWork.LotSupplyRepository.GetBy(x => x.Id == lotSupplyId, i => i.Supply);
+                if (lotSupplyEntity == null)
                 {
-                    return new ServiceResponse<LotTestDto?>
+                    return new ServiceResponse<LotSupplyDto?>
                     {
                         Success = false,
-                        Message = $"Không có lô hoá chất nào với Id = {lotTestId}."
+                        Message = $"Không có lô hoá chất phụ nào với Id = {lotSupplyId}."
                     };
                 }
 
-                return new ServiceResponse<LotTestDto?>
+                return new ServiceResponse<LotSupplyDto?>
                 {
                     Success = true,
-                    Data = lotTestEntity.ConvertToDto()
+                    Data = lotSupplyEntity.ConvertToDto()
                 };
             }
             catch (Exception)
             {
-                return new ServiceResponse<LotTestDto?>
+                return new ServiceResponse<LotSupplyDto?>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy lô hoá chất."
+                    Message = $"Xảy ra lỗi trong quá trình lấy lô hoá chất phụ."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> SetDefault(int lotTestId)
+        public async Task<ServiceResponse<bool>> SetDefault(int lotSupplyId)
         {
             try
             {
-                var lotTestDefault = await _unitOfWork.LotTestRepository.GetBy(x => x.Id == lotTestId);
-                if (lotTestDefault == null)
+                var lotSupplyDefault = await _unitOfWork.LotSupplyRepository.GetBy(x => x.Id == lotSupplyId);
+                if (lotSupplyDefault == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Không có lô hoá chất nào với Id = {lotTestId}."
+                        Message = $"Không có lô hoá chất phụ nào với Id = {lotSupplyId}."
                     };
                 }
 
-                var lotTestList = await _unitOfWork.LotTestRepository.GetListBy(x => x.Id != lotTestId && x.Default == true);
-                lotTestList.ToList().ForEach(x => x.Default = false);
+                var lotSupplyList = await _unitOfWork.LotSupplyRepository.GetListBy(x => x.Id != lotSupplyId && x.Default == true);
+                lotSupplyList.ToList().ForEach(x => x.Default = false);
                 
-                lotTestDefault.Default = true;
-                _unitOfWork.LotTestRepository.Update(lotTestDefault);
+                lotSupplyDefault.Default = true;
+                _unitOfWork.LotSupplyRepository.Update(lotSupplyDefault);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -210,30 +210,30 @@ namespace Server.Services
                 return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình đặt mặc định cho lô hoá chất."
+                    Message = $"Xảy ra lỗi trong quá trình đặt mặc định cho lô hoá chất phụ."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, LotTestDto lotTestRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, LotSupplyDto request)
         {
             try
             {
-                var lotTestEntity = await _unitOfWork.LotTestRepository.GetBy(x => x.Id == id);
-                if (lotTestEntity == null)
+                var lotSupplyEntity = await _unitOfWork.LotSupplyRepository.GetBy(x => x.Id == id);
+                if (lotSupplyEntity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Không có lô hoá chất nào với Id = {id}."
+                        Message = $"Không có lô hoá chất phụ nào với Id = {id}."
                     };
                 }
 
-                lotTestEntity.LotNumber = lotTestRequest.LotNumber;
-                lotTestEntity.ExpDate=lotTestRequest.ExpDate;
-                lotTestEntity.TestQCId = lotTestRequest.TestQCId;
+                lotSupplyEntity.LotNumber = request.LotNumber;
+                lotSupplyEntity.ExpDate=request.ExpDate;
+                lotSupplyEntity.SupplyId = request.SupplyId;
 
-                _unitOfWork.LotTestRepository.Update(lotTestEntity);
+                _unitOfWork.LotSupplyRepository.Update(lotSupplyEntity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -244,14 +244,14 @@ namespace Server.Services
             }
             catch (Exception ex)
             {
-                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật lô hoá chất.";
+                string errorMessage = "Xảy ra lỗi trong quá trình cập nhật lô hoá chất phụ.";
 
                 if (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException)
                 {
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng tên lô hoá chất.";
+                        errorMessage = "Xảy ra lỗi do trùng tên lô hoá chất phụ.";
                     }
                 }
 

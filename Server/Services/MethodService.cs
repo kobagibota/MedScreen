@@ -56,7 +56,7 @@ namespace Server.Services
                     MethodName = request.MethodName
                 };
 
-                await _unitOfWork.MethodRepository.AddAsync(newMethod);
+                await _unitOfWork.MethodRepository.Add(newMethod);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<MethodDto>
@@ -87,11 +87,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int methodIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int methodId)
         {
             try
             {
-                var methodEntity = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == methodIdRequest);
+                var methodEntity = await _unitOfWork.MethodRepository.GetBy(x => x.Id == methodId);
                 if (methodEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -124,7 +124,7 @@ namespace Server.Services
         {
             try
             {
-                var methodList = await _unitOfWork.MethodRepository.GetAllAsync();
+                var methodList = await _unitOfWork.MethodRepository.GetAll();
 
                 return new ServiceResponse<IEnumerable<MethodDto>>
                 {
@@ -142,17 +142,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<MethodDto?>> GetById(int methodIdRequest)
+        public async Task<ServiceResponse<MethodDto?>> GetById(int methodId)
         {
             try
             {
-                var methodEntity = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == methodIdRequest);
+                var methodEntity = await _unitOfWork.MethodRepository.GetBy(x => x.Id == methodId);
                 if (methodEntity == null)
                 {
                     return new ServiceResponse<MethodDto?>
                     {
                         Success = false,
-                        Message = $"Không có phương pháp nào với Id = {methodIdRequest}."
+                        Message = $"Không có phương pháp nào với Id = {methodId}."
                     };
                 }
 
@@ -172,11 +172,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, MethodDto categoryRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, MethodDto methodRequest)
         {
             try
             {
-                var methodEntity = await _unitOfWork.MethodRepository.GetAsync(x => x.Id == id);
+                var methodEntity = await _unitOfWork.MethodRepository.GetBy(x => x.Id == id);
                 if (methodEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -186,7 +186,7 @@ namespace Server.Services
                     };
                 }
 
-                methodEntity.MethodName = categoryRequest.MethodName;
+                methodEntity.MethodName = methodRequest.MethodName;
 
                 _unitOfWork.MethodRepository.Update(methodEntity);
                 await _unitOfWork.CommitAsync();

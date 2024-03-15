@@ -36,7 +36,7 @@ namespace Server.Services
 
         #endregion
 
-        #region Standards
+        #region Methods
 
         public async Task<ServiceResponse<StandardDto>> Add(StandardDto request)
         {
@@ -56,7 +56,7 @@ namespace Server.Services
                     StandardName = request.StandardName
                 };
 
-                await _unitOfWork.StandardRepository.AddAsync(newStandard);
+                await _unitOfWork.StandardRepository.Add(newStandard);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<StandardDto>
@@ -87,11 +87,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int standardIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int standardId)
         {
             try
             {
-                var standardEntity = await _unitOfWork.StandardRepository.GetAsync(x => x.Id == standardIdRequest);
+                var standardEntity = await _unitOfWork.StandardRepository.GetBy(x => x.Id == standardId);
                 if (standardEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -124,7 +124,7 @@ namespace Server.Services
         {
             try
             {
-                var standardList = await _unitOfWork.StandardRepository.GetAllAsync();
+                var standardList = await _unitOfWork.StandardRepository.GetAll();
 
                 return new ServiceResponse<IEnumerable<StandardDto>>
                 {
@@ -142,17 +142,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<StandardDto?>> GetById(int standardIdRequest)
+        public async Task<ServiceResponse<StandardDto?>> GetById(int standardId)
         {
             try
             {
-                var standardEntity = await _unitOfWork.StandardRepository.GetAsync(x => x.Id == standardIdRequest);
+                var standardEntity = await _unitOfWork.StandardRepository.GetBy(x => x.Id == standardId);
                 if (standardEntity == null)
                 {
                     return new ServiceResponse<StandardDto?>
                     {
                         Success = false,
-                        Message = $"Không có chuẩn phiên giải nào với Id = {standardIdRequest}."
+                        Message = $"Không có chuẩn phiên giải nào với Id = {standardId}."
                     };
                 }
 
@@ -172,11 +172,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, StandardDto categoryRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, StandardDto request)
         {
             try
             {
-                var standardEntity = await _unitOfWork.StandardRepository.GetAsync(x => x.Id == id);
+                var standardEntity = await _unitOfWork.StandardRepository.GetBy(x => x.Id == id);
                 if (standardEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -186,7 +186,7 @@ namespace Server.Services
                     };
                 }
 
-                standardEntity.StandardName = categoryRequest.StandardName;
+                standardEntity.StandardName = request.StandardName;
 
                 _unitOfWork.StandardRepository.Update(standardEntity);
                 await _unitOfWork.CommitAsync();

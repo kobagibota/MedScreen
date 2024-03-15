@@ -7,8 +7,14 @@ namespace ServerLibrary.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
+        #region Private members
+
         protected readonly AppDbContext _dbContext;
         private readonly DbSet<T> _entitySet;
+
+        #endregion
+
+        #region Constructor
 
         public GenericRepository(AppDbContext context)
         {
@@ -16,33 +22,21 @@ namespace ServerLibrary.Repositories
             _entitySet = _dbContext.Set<T>();
         }
 
-        public void Add(T entity)
+        #endregion
+
+        #region Methods
+
+        public async Task Add(T entity)
         {
-            _dbContext.Add(entity);
+            await _dbContext.AddAsync(entity);
         }
 
-        public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
+        public async Task AddRange(IEnumerable<T> entities)
         {
-            await _dbContext.AddAsync(entity, cancellationToken);
+            await _dbContext.AddRangeAsync(entities);
         }
 
-        public void AddRange(IEnumerable<T> entities)
-        {
-            _dbContext.AddRange(entities);
-        }
-
-        public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
-        {
-            await _dbContext.AddRangeAsync(entities, cancellationToken);
-        }
-
-        public T Get(Expression<Func<T, bool>> expression)
-        {
-            T result = _entitySet.FirstOrDefault(expression);
-            return result;
-        }
-
-        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetBy(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> items = _entitySet;
 
@@ -54,15 +48,18 @@ namespace ServerLibrary.Repositories
                 }
             }
 
-            return await items.SingleOrDefaultAsync(expression);
+            if (predicate != null)
+            {
+                return await items.FirstOrDefaultAsync(predicate);
+            }
+            else
+            {
+                return await items.FirstOrDefaultAsync();
+            }
         }
 
-        public IEnumerable<T> GetAll()
-        {
-            return _entitySet.AsEnumerable();
-        }
 
-        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
+        public async Task<IEnumerable<T>> GetAll(params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> items = _entitySet;
 
@@ -77,15 +74,26 @@ namespace ServerLibrary.Repositories
             return await items.ToListAsync();
         }
 
-        public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
+        public async Task<IEnumerable<T>> GetListBy(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
-            return _entitySet.Where(expression).AsEnumerable();
+            IQueryable<T> items = _entitySet;
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    items = items.Include(include);
+                }
+            }
+
+            if (predicate != null)
+            {
+                items = items.Where(predicate);
+            }
+
+            return await items.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
-        {
-            return await _entitySet.Where(expression).ToListAsync(cancellationToken);
-        }
 
         public void Remove(T entity)
         {
@@ -106,5 +114,7 @@ namespace ServerLibrary.Repositories
         {
             _dbContext.UpdateRange(entities);
         }
+
+        #endregion
     }
 }

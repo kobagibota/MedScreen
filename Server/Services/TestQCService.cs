@@ -36,13 +36,13 @@ namespace Server.Services
 
         #endregion
 
-        #region TestQCs
+        #region Methods
 
         public async Task<ServiceResponse<TestQCDto>> Add(TestQCDto request)
         {
             try
             {
-                var testType = await _unitOfWork.TestTypeRepository.GetAsync(x => x.Id == request.TestTypeId);
+                var testType = await _unitOfWork.TestTypeRepository.GetBy(x => x.Id == request.TestTypeId);
                 if (request == null || testType == null)
                 {
                     return new ServiceResponse<TestQCDto>
@@ -59,7 +59,7 @@ namespace Server.Services
                     TestType = testType
                 };
 
-                await _unitOfWork.TestQCRepository.AddAsync(newTestQC);
+                await _unitOfWork.TestQCRepository.Add(newTestQC);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<TestQCDto>
@@ -90,11 +90,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Delete(int testQCIdRequest)
+        public async Task<ServiceResponse<bool>> Delete(int testQCId)
         {
             try
             {
-                var testQCEntity = await _unitOfWork.TestQCRepository.GetAsync(x => x.Id == testQCIdRequest);
+                var testQCEntity = await _unitOfWork.TestQCRepository.GetBy(x => x.Id == testQCId);
                 if (testQCEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -127,7 +127,7 @@ namespace Server.Services
         {
             try
             {
-                var testQCList = await _unitOfWork.TestQCRepository.GetAllAsync(x => x.TestType);
+                var testQCList = await _unitOfWork.TestQCRepository.GetAll(x => x.TestType);
 
                 return new ServiceResponse<IEnumerable<TestQCDto>>
                 {
@@ -145,17 +145,17 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<TestQCDto?>> GetById(int testQCIdRequest)
+        public async Task<ServiceResponse<TestQCDto?>> GetById(int testQCId)
         {
             try
             {
-                var testQCEntity = await _unitOfWork.TestQCRepository.GetAsync(x => x.Id == testQCIdRequest, i => i.TestType);
+                var testQCEntity = await _unitOfWork.TestQCRepository.GetBy(x => x.Id == testQCId, i => i.TestType);
                 if (testQCEntity == null)
                 {
                     return new ServiceResponse<TestQCDto?>
                     {
                         Success = false,
-                        Message = $"Không có loại thuốc thử nào với Id = {testQCIdRequest}."
+                        Message = $"Không có loại thuốc thử nào với Id = {testQCId}."
                     };
                 }
 
@@ -175,11 +175,11 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(int id, TestQCDto testQCRequest)
+        public async Task<ServiceResponse<bool>> Update(int id, TestQCDto request)
         {
             try
             {
-                var testQCEntity = await _unitOfWork.TestQCRepository.GetAsync(x => x.Id == id);
+                var testQCEntity = await _unitOfWork.TestQCRepository.GetBy(x => x.Id == id);
                 if (testQCEntity == null)
                 {
                     return new ServiceResponse<bool>
@@ -189,8 +189,8 @@ namespace Server.Services
                     };
                 }
 
-                testQCEntity.TestQCName = testQCRequest.TestQCName;
-                testQCEntity.TestTypeId = testQCRequest.TestTypeId;
+                testQCEntity.TestQCName = request.TestQCName;
+                testQCEntity.TestTypeId = request.TestTypeId;
 
                 _unitOfWork.TestQCRepository.Update(testQCEntity);
                 await _unitOfWork.CommitAsync();

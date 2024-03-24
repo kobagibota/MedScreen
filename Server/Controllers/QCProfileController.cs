@@ -1,26 +1,27 @@
 ﻿using BaseLibrary.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Server.Extensions;
 using Server.Services;
 
 namespace Server.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireAdminRole")]
     [Route("api/[controller]")]
     [ApiController]
-    public class TestQCController : ControllerBase
+    public class QCProfileController : ControllerBase
     {
         #region Private Members
 
-        private readonly ITestQCService _testQCService;
+        private readonly IQCProfileService _qcProfileService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public TestQCController(ITestQCService testQCService)
+        public QCProfileController(IQCProfileService qcProfileService)
         {
-            _testQCService = testQCService;
+            _qcProfileService = qcProfileService;
         }
 
         #endregion Constructor
@@ -30,14 +31,15 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var response = await _testQCService.GetAll();
+            string userId = HttpContext.GetUserId();
+            var response = await _qcProfileService.GetListByUserId(userId);
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _testQCService.GetById(id);
+            var response = await _qcProfileService.GetById(id);
 
             if (response == null)
                 return NotFound();
@@ -46,7 +48,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TestQCDto request)
+        public async Task<IActionResult> Create([FromBody] QCProfileDto request)
         {
             try
             {
@@ -55,7 +57,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _testQCService.Add(request);
+                var response = await _qcProfileService.Add(request);
 
                 if (response.Success)
                 {
@@ -71,8 +73,7 @@ namespace Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] TestQCDto request)
+        public async Task<IActionResult> Update([FromBody] QCProfileDto request)
         {
             try
             {
@@ -81,7 +82,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _testQCService.Update(id, request);
+                var response = await _qcProfileService.Update(request);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -100,7 +101,7 @@ namespace Server.Controllers
         {
             try
             {
-                var response = await _testQCService.Delete(id);
+                var response = await _qcProfileService.Delete(id);
 
                 if (!response.Success)
                 {

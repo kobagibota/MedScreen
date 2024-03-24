@@ -9,7 +9,8 @@ namespace ServerLibrary.Configurations
         public void Configure(EntityTypeBuilder<SupplyProfile> builder)
         {
             builder.ToTable("SupplyProfiles");
-            builder.HasKey(x => new { x.SupplyId, x.QCProfileId });
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.HasOne(o => o.Supply).WithMany(m => m.SupplyProfiles).HasForeignKey(i => i.SupplyId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(o => o.QCProfile).WithMany(m => m.SupplyProfiles).HasForeignKey(i => i.QCProfileId).OnDelete(DeleteBehavior.Cascade);

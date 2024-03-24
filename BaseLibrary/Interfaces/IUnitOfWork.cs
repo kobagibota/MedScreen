@@ -2,6 +2,8 @@
 {
     public interface IUnitOfWork : IDisposable
     {
+        IUserRepository UserRepository { get; }
+
         ILaboratoryRepository LaboratoryRepository { get; }
         IQCActionRepository QCActionRepository { get; }
         ICategoryRepository CategoryRepository { get; }

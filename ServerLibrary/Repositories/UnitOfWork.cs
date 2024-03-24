@@ -9,6 +9,8 @@ namespace ServerLibrary.Repositories
 
         private readonly AppDbContext _dbContext;
 
+        private IUserRepository _userRepository;
+
         private ILaboratoryRepository _laboratoryRepository;
         private IQCActionRepository _qcActionRepository;
         private ICategoryRepository _categoryRepository;
@@ -43,6 +45,12 @@ namespace ServerLibrary.Repositories
         #endregion
 
         #region Properties
+
+
+        public IUserRepository UserRepository
+        {
+            get { return _userRepository ??= new UserRepository(_dbContext); }
+        }
 
         public ILaboratoryRepository LaboratoryRepository
         {

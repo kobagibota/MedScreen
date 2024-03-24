@@ -8,19 +8,19 @@ namespace Server.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class TestQCController : ControllerBase
+    public class SupplyProfileController : ControllerBase
     {
         #region Private Members
 
-        private readonly ITestQCService _testQCService;
+        private readonly ISupplyProfileService _supplyProfileService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public TestQCController(ITestQCService testQCService)
+        public SupplyProfileController(ISupplyProfileService supplyProfileService)
         {
-            _testQCService = testQCService;
+            _supplyProfileService = supplyProfileService;
         }
 
         #endregion Constructor
@@ -28,16 +28,17 @@ namespace Server.Controllers
         #region Methods
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Route("qcprofile/{qcProfileId}")]
+        public async Task<IActionResult> GetAll(int qcProfileId)
         {
-            var response = await _testQCService.GetAll();
+            var response = await _supplyProfileService.GetByQCProfileId(qcProfileId);
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _testQCService.GetById(id);
+            var response = await _supplyProfileService.GetById(id);
 
             if (response == null)
                 return NotFound();
@@ -46,7 +47,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TestQCDto request)
+        public async Task<IActionResult> Create([FromBody] SupplyProfileDto request)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _testQCService.Add(request);
+                var response = await _supplyProfileService.Add(request);
 
                 if (response.Success)
                 {
@@ -71,8 +72,7 @@ namespace Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] TestQCDto request)
+        public async Task<IActionResult> Update([FromBody] SupplyProfileDto request)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _testQCService.Update(id, request);
+                var response = await _supplyProfileService.Update(request);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -100,7 +100,7 @@ namespace Server.Controllers
         {
             try
             {
-                var response = await _testQCService.Delete(id);
+                var response = await _supplyProfileService.Delete(id);
 
                 if (!response.Success)
                 {

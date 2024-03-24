@@ -9,7 +9,7 @@
         public required string QCName { get; set; }
         public bool Hide { get; set; }
 
-        public virtual required Laboratory Laboratory { get; set; }
+        public virtual Laboratory? Laboratory { get; set; }
         public virtual required Method Method { get; set; }
         public virtual required Category Category { get; set; }
 

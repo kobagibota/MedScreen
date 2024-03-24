@@ -1,6 +1,6 @@
-﻿namespace BaseLibrary.Entities
+﻿namespace BaseLibrary.Dtos
 {
-    public class SupplyProfile
+    public class SupplyProfileDto
     {
         public int Id { get; set; }
         public int SupplyId { get; set; }
@@ -8,7 +8,7 @@
         public int? SortOrder { get; set; }
         public bool InUse { get; set; }
 
-        public virtual required Supply Supply { get; set; }
-        public virtual required QCProfile QCProfile { get; set; }
+        public string? SupplyName { get; set; }
+        public string? QCProfileName { get; set; }
     }
 }

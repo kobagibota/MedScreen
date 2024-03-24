@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServerLibrary.Data;
 
@@ -11,9 +12,11 @@ using ServerLibrary.Data;
 namespace ServerLibrary.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240323110513_UpdateHashPassword")]
+    partial class UpdateHashPassword
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,19 +88,19 @@ namespace ServerLibrary.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("191d2401-ce54-4aec-89da-5cdb393558b4"),
+                            Id = new Guid("49d08331-6e86-495e-8715-c5cc1a249491"),
                             Description = "Quản trị hệ thống",
                             Name = "Administrator"
                         },
                         new
                         {
-                            Id = new Guid("a4205ee0-8d4b-4a1c-bba2-0fc5c81a79c8"),
+                            Id = new Guid("05657df1-8a9e-4376-bd4b-c826c6370275"),
                             Description = "Quản lý",
                             Name = "Manager"
                         },
                         new
                         {
-                            Id = new Guid("5851e421-0a75-410a-9bc0-e8a5219b0ddf"),
+                            Id = new Guid("1e079928-89ae-4f28-9956-dbe25a8a3c08"),
                             Description = "Người dùng",
                             Name = "User"
                         });
@@ -188,9 +191,9 @@ namespace ServerLibrary.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("827f5530-eda5-4262-b04f-77fcf56a1773"),
+                            Id = new Guid("197dd8d3-f822-41d4-b54a-0488ef9680cd"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8c579124-1d4d-48d3-a8a9-b65d8b657be7",
+                            ConcurrencyStamp = "560d0a86-d2e8-4966-843e-719af78b49f3",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = false,
                             FirstName = "Hoằng",
@@ -199,10 +202,10 @@ namespace ServerLibrary.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "$2a$11$ZUM//0kRv7hp7aKm9NR.TOeDQm1O35z.Nao5v8VqFtyelSHDbOPtK",
+                            PasswordHash = "$2a$11$/g8NsPRlneRYBLjw23MWPecLyGqYPFBCzBp5xg8BLQTQwvnkZUyGS",
                             PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "63459320-e64f-4b0a-a50d-72fc58229606",
+                            SecurityStamp = "fd424ce8-47aa-4a5d-ab45-059dbb41bd3f",
                             TwoFactorEnabled = false,
                             UserName = "superadmin"
                         });
@@ -762,29 +765,21 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.SupplyProfile", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("SupplyId")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("InUse")
-                        .HasColumnType("bit");
 
                     b.Property<int>("QCProfileId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("InUse")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("SortOrder")
                         .HasColumnType("int");
 
-                    b.Property<int>("SupplyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
+                    b.HasKey("SupplyId", "QCProfileId");
 
                     b.HasIndex("QCProfileId");
-
-                    b.HasIndex("SupplyId");
 
                     b.ToTable("SupplyProfiles", (string)null);
                 });
@@ -1005,8 +1000,8 @@ namespace ServerLibrary.Data.Migrations
                     b.HasData(
                         new
                         {
-                            RoleId = new Guid("191d2401-ce54-4aec-89da-5cdb393558b4"),
-                            UserId = new Guid("827f5530-eda5-4262-b04f-77fcf56a1773")
+                            RoleId = new Guid("49d08331-6e86-495e-8715-c5cc1a249491"),
+                            UserId = new Guid("197dd8d3-f822-41d4-b54a-0488ef9680cd")
                         });
                 });
 

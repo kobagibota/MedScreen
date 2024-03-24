@@ -11,7 +11,6 @@ namespace ServerLibrary.Data
         {
             Guid userId = Guid.NewGuid();
             Guid roleId = Guid.NewGuid();
-            var hasher = new PasswordHasher<AppUser>();
             var newlab = new Laboratory()
             {
                 Id = 1,
@@ -35,7 +34,7 @@ namespace ServerLibrary.Data
                 UserName = "superadmin",
                 NormalizedUserName = "SUPERADMIN",
                 SecurityStamp = Guid.NewGuid().ToString(),
-                PasswordHash = hasher.HashPassword(null, "@dmin123")
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("@dmin123")
             };
             modelBuilder.Entity<AppUser>().HasData(newUser);
 

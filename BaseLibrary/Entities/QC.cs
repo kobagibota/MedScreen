@@ -14,7 +14,7 @@ namespace BaseLibrary.Entities
         public QCStatus Status { get; set; } = QCStatus.New;
         public DateTime DateCreated { get; set; }
 
-        public virtual required Laboratory Laboratory { get; set; }
+        public virtual Laboratory? Laboratory { get; set; }
         public virtual required AppUser User { get; set; }
         public virtual required QCProfile QCProfile { get; set; }
         public virtual QC? ReQC { get; set; }

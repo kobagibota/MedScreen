@@ -1,5 +1,6 @@
 ﻿using BaseLibrary.Dtos;
 using BaseLibrary.Entities;
+using System.Collections.Generic;
 
 namespace BaseLibrary.Extentions
 {
@@ -234,6 +235,87 @@ namespace BaseLibrary.Extentions
         {
             return strainTypes.Select(ConvertToDto);
         }
+
+        #endregion
+
+        #region AppUser
+
+        public static UserDto ConvertToDto(this AppUser user, IEnumerable<string> roles)
+        {
+            var userDto = new UserDto()
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Roles = string.Join(", ", roles)
+            };
+            return userDto;
+        }
+
+
+        public static IEnumerable<UserDto> ConvertToDto(this IEnumerable<AppUser> users, IEnumerable<string> roles)
+        {
+            return users.Select(user=>user.ConvertToDto(roles));
+        }
+
+        #endregion
+
+        #region SupplyProfile
+
+        public static SupplyProfileDto ConvertToDto(this SupplyProfile supplyProfile)
+        {
+            var supplyProfileDto = new SupplyProfileDto()
+            {
+                Id = supplyProfile.Id,
+                SupplyId = supplyProfile.SupplyId,
+                QCProfileId = supplyProfile.QCProfileId,
+                SortOrder = supplyProfile.SortOrder,
+                SupplyName = supplyProfile.Supply.SupplyName,
+                QCProfileName = supplyProfile.QCProfile.QCName,
+                InUse = supplyProfile.InUse
+            };
+            return supplyProfileDto;
+        }
+
+
+        public static IEnumerable<SupplyProfileDto> ConvertToDto(this IEnumerable<SupplyProfile> supplyProfiles)
+        {
+            return supplyProfiles.Select(ConvertToDto);
+        }
+
+        #endregion
+
+        #region QCProfile
+
+        public static QCProfileDto ConvertToDto(this QCProfile qcProfile)
+        {
+            var qcProfileDto = new QCProfileDto()
+            {
+                Id = qcProfile.Id,
+                LabId = qcProfile.LabId,
+                MethodId = qcProfile.MethodId,
+                CategoryId = qcProfile.CategoryId,
+                QCName = qcProfile.QCName,
+                Hide = qcProfile.Hide,
+                LaboratoryName = qcProfile.Laboratory.LabName,
+                CategoryName = qcProfile.Category.CategoryName,
+                MethodName = qcProfile.Method.MethodName
+            };
+            return qcProfileDto;
+        }
+
+
+        public static IEnumerable<QCProfileDto> ConvertToDto(this IEnumerable<QCProfile> qcProfiles)
+        {
+            return qcProfiles.Select(ConvertToDto);
+        }
+
+        #endregion
+
+        #region Category
+
+
 
         #endregion
 

@@ -8,18 +8,18 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface IStrainTypeService
+    public interface ISupplyProfileService
     {
-        Task<ServiceResponse<IEnumerable<StrainTypeDto>>> GetByStrainId(int strainId);
-        Task<ServiceResponse<StrainTypeDto?>> GetById(int Id);
-        Task<ServiceResponse<StrainTypeDto>> Add(StrainTypeDto newStrainType);
-        Task<ServiceResponse<bool>> Update(StrainTypeDto request);
+        Task<ServiceResponse<IEnumerable<SupplyProfileDto>>> GetByQCProfileId(int qCProfileId);
+        Task<ServiceResponse<SupplyProfileDto?>> GetById(int Id);
+        Task<ServiceResponse<SupplyProfileDto>> Add(SupplyProfileDto newSupplyProfile);
+        Task<ServiceResponse<bool>> Update(SupplyProfileDto request);
         Task<ServiceResponse<bool>> Delete(int Id);
     }
 
     #endregion
 
-    public class StrainTypeService : IStrainTypeService
+    public class SupplyProfileService : ISupplyProfileService
     {
         #region Private properties
 
@@ -29,7 +29,7 @@ namespace Server.Services
 
         #region Constructor
 
-        public StrainTypeService(IUnitOfWork unitOfWork)
+        public SupplyProfileService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -38,36 +38,38 @@ namespace Server.Services
 
         #region Methods
 
-        public async Task<ServiceResponse<StrainTypeDto>> Add(StrainTypeDto request)
+        public async Task<ServiceResponse<SupplyProfileDto>> Add(SupplyProfileDto request)
         {
             try
             {
-                var strain = await _unitOfWork.StrainRepository.GetBy(x => x.Id == request.StrainId);
-                var category = await _unitOfWork.CategoryRepository.GetBy(x => x.Id == request.CategoryId);
-                if (request == null || strain == null || category == null)
+                var qCProfile = await _unitOfWork.QCProfileRepository.GetBy(x => x.Id == request.QCProfileId);
+                var supply = await _unitOfWork.SupplyRepository.GetBy(x => x.Id == request.SupplyId);
+                if (request == null || qCProfile == null || supply == null)
                 {
-                    return new ServiceResponse<StrainTypeDto>
+                    return new ServiceResponse<SupplyProfileDto>
                     {
                         Success = false,
-                        Message = $"Thiếu thông tin loại chủng."
+                        Message = $"Thiếu thông tin hoá chất phụ."
                     };
                 }
 
-                var newStrainType = new StrainType
+                var newSupplyProfile = new SupplyProfile
                 {
-                    StrainId = request.StrainId,
-                    CategoryId = request.CategoryId,
-                    Strain = strain,
-                    Category = category
+                    QCProfileId = request.QCProfileId,
+                    SupplyId = request.SupplyId,
+                    SortOrder = request.SortOrder,
+                    InUse = request.InUse,
+                    Supply = supply,
+                    QCProfile = qCProfile
                 };
 
-                await _unitOfWork.StrainTypeRepository.Add(newStrainType);
+                await _unitOfWork.SupplyProfileRepository.Add(newSupplyProfile);
                 await _unitOfWork.CommitAsync();
 
-                return new ServiceResponse<StrainTypeDto>
+                return new ServiceResponse<SupplyProfileDto>
                 {
                     Success = true,
-                    Data = newStrainType.ConvertToDto(),
+                    Data = newSupplyProfile.ConvertToDto(),
                     Message = $"Đã thêm thành công!"
                 };
             }
@@ -84,7 +86,7 @@ namespace Server.Services
                     }
                 }
 
-                return new ServiceResponse<StrainTypeDto>
+                return new ServiceResponse<SupplyProfileDto>
                 {
                     Success = false,
                     Message = errorMessage
@@ -96,17 +98,17 @@ namespace Server.Services
         {
             try
             {
-                var entity = await _unitOfWork.StrainTypeRepository.GetBy(x => x.Id == id);
+                var entity = await _unitOfWork.SupplyProfileRepository.GetBy(x => x.Id == id);
                 if (entity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Tìm không thấy loại chủng cần xoá!"
+                        Message = $"Tìm không thấy hoá chất phụ cần xoá!"
                     };
                 }
 
-                _unitOfWork.StrainTypeRepository.Remove(entity);
+                _unitOfWork.SupplyProfileRepository.Remove(entity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -125,13 +127,13 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<StrainTypeDto>>> GetByStrainId(int strainId)
+        public async Task<ServiceResponse<IEnumerable<SupplyProfileDto>>> GetByQCProfileId(int qCProfileId)
         {
             try
             {
-                var list = await _unitOfWork.StrainTypeRepository.GetListBy(x => x.StrainId == strainId, s => s.Strain, c => c.Category);
+                var list = await _unitOfWork.SupplyProfileRepository.GetListBy(x => x.QCProfileId == qCProfileId, q => q.QCProfile, s => s.Supply);
 
-                return new ServiceResponse<IEnumerable<StrainTypeDto>>
+                return new ServiceResponse<IEnumerable<SupplyProfileDto>>
                 {
                     Success = true,
                     Data = list.ConvertToDto()
@@ -139,29 +141,29 @@ namespace Server.Services
             }
             catch (Exception)
             {
-                return new ServiceResponse<IEnumerable<StrainTypeDto>>
+                return new ServiceResponse<IEnumerable<SupplyProfileDto>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách loại chủng."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách hoá chất phụ."
                 };
             }
         }
 
-        public async Task<ServiceResponse<StrainTypeDto?>> GetById(int id)
+        public async Task<ServiceResponse<SupplyProfileDto?>> GetById(int id)
         {
             try
             {
-                var entity = await _unitOfWork.StrainTypeRepository.GetBy(x => x.Id == id, c => c.Category, s => s.Strain);
+                var entity = await _unitOfWork.SupplyProfileRepository.GetBy(x => x.Id == id, q => q.QCProfile, s => s.Supply);
                 if (entity == null)
                 {
-                    return new ServiceResponse<StrainTypeDto?>
+                    return new ServiceResponse<SupplyProfileDto?>
                     {
                         Success = false,
-                        Message = $"Không có loại chủng cần tìm."
+                        Message = $"Không có hoá chất phụ cần tìm."
                     };
                 }
 
-                return new ServiceResponse<StrainTypeDto?>
+                return new ServiceResponse<SupplyProfileDto?>
                 {
                     Success = true,
                     Data = entity.ConvertToDto()
@@ -169,32 +171,34 @@ namespace Server.Services
             }
             catch (Exception)
             {
-                return new ServiceResponse<StrainTypeDto?>
+                return new ServiceResponse<SupplyProfileDto?>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy loại chủng."
+                    Message = $"Xảy ra lỗi trong quá trình lấy hoá chất phụ."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(StrainTypeDto request)
+        public async Task<ServiceResponse<bool>> Update(SupplyProfileDto request)
         {
             try
             {
-                var entity = await _unitOfWork.StrainTypeRepository.GetBy(x => x.Id == request.Id);
+                var entity = await _unitOfWork.SupplyProfileRepository.GetBy(x => x.Id == request.Id);
                 if (entity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Không có loại chủng nào cần tìm."
+                        Message = $"Không có hoá chất phụ nào cho QC cần tìm."
                     };
                 }
 
-                entity.CategoryId = request.CategoryId;
+                entity.QCProfileId = request.QCProfileId;
+                entity.SupplyId = request.SupplyId;
+                entity.SortOrder = request.SortOrder;
                 entity.InUse = request.InUse;
 
-                _unitOfWork.StrainTypeRepository.Update(entity);
+                _unitOfWork.SupplyProfileRepository.Update(entity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -208,7 +212,7 @@ namespace Server.Services
                 return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình cập nhật loại chủng."
+                    Message = $"Xảy ra lỗi trong quá trình cập nhật hoá chất phụ cho QC."
                 };
             }
         }

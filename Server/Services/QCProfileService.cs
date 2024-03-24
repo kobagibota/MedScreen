@@ -8,18 +8,18 @@ namespace Server.Services
 {
     #region Interface
 
-    public interface IStrainTypeService
+    public interface IQCProfileService
     {
-        Task<ServiceResponse<IEnumerable<StrainTypeDto>>> GetByStrainId(int strainId);
-        Task<ServiceResponse<StrainTypeDto?>> GetById(int Id);
-        Task<ServiceResponse<StrainTypeDto>> Add(StrainTypeDto newStrainType);
-        Task<ServiceResponse<bool>> Update(StrainTypeDto request);
+        Task<ServiceResponse<IEnumerable<QCProfileDto>>> GetListByUserId(string userId);
+        Task<ServiceResponse<QCProfileDto?>> GetById(int Id);
+        Task<ServiceResponse<QCProfileDto>> Add(QCProfileDto newQCProfile);
+        Task<ServiceResponse<bool>> Update(QCProfileDto request);
         Task<ServiceResponse<bool>> Delete(int Id);
     }
 
     #endregion
 
-    public class StrainTypeService : IStrainTypeService
+    public class QCProfileService : IQCProfileService
     {
         #region Private properties
 
@@ -29,7 +29,7 @@ namespace Server.Services
 
         #region Constructor
 
-        public StrainTypeService(IUnitOfWork unitOfWork)
+        public QCProfileService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -38,36 +38,39 @@ namespace Server.Services
 
         #region Methods
 
-        public async Task<ServiceResponse<StrainTypeDto>> Add(StrainTypeDto request)
+        public async Task<ServiceResponse<QCProfileDto>> Add(QCProfileDto request)
         {
             try
             {
-                var strain = await _unitOfWork.StrainRepository.GetBy(x => x.Id == request.StrainId);
+                var method = await _unitOfWork.MethodRepository.GetBy(x => x.Id == request.MethodId);
                 var category = await _unitOfWork.CategoryRepository.GetBy(x => x.Id == request.CategoryId);
-                if (request == null || strain == null || category == null)
+                if (request == null || method == null || category == null)
                 {
-                    return new ServiceResponse<StrainTypeDto>
+                    return new ServiceResponse<QCProfileDto>
                     {
                         Success = false,
-                        Message = $"Thiếu thông tin loại chủng."
+                        Message = $"Thiếu thông tin cấu hình QC."
                     };
                 }
 
-                var newStrainType = new StrainType
+                var newQCProfile = new QCProfile
                 {
-                    StrainId = request.StrainId,
+                    LabId = request.LabId,
                     CategoryId = request.CategoryId,
-                    Strain = strain,
-                    Category = category
+                    MethodId = request.MethodId,
+                    QCName = request.QCName,
+                    Hide = request.Hide,
+                    Category = category,
+                    Method = method
                 };
 
-                await _unitOfWork.StrainTypeRepository.Add(newStrainType);
+                await _unitOfWork.QCProfileRepository.Add(newQCProfile);
                 await _unitOfWork.CommitAsync();
 
-                return new ServiceResponse<StrainTypeDto>
+                return new ServiceResponse<QCProfileDto>
                 {
                     Success = true,
-                    Data = newStrainType.ConvertToDto(),
+                    Data = newQCProfile.ConvertToDto(),
                     Message = $"Đã thêm thành công!"
                 };
             }
@@ -80,11 +83,11 @@ namespace Server.Services
                     int errorCode = sqlException.Number;
                     if (errorCode == 2627 || errorCode == 2601)
                     {
-                        errorMessage = "Xảy ra lỗi do trùng loại chủng.";
+                        errorMessage = "Xảy ra lỗi do trùng tên cấu hình QC.";
                     }
                 }
 
-                return new ServiceResponse<StrainTypeDto>
+                return new ServiceResponse<QCProfileDto>
                 {
                     Success = false,
                     Message = errorMessage
@@ -96,17 +99,17 @@ namespace Server.Services
         {
             try
             {
-                var entity = await _unitOfWork.StrainTypeRepository.GetBy(x => x.Id == id);
+                var entity = await _unitOfWork.QCProfileRepository.GetBy(x => x.Id == id);
                 if (entity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Tìm không thấy loại chủng cần xoá!"
+                        Message = $"Tìm không thấy cấu hình QC cần xoá!"
                     };
                 }
 
-                _unitOfWork.StrainTypeRepository.Remove(entity);
+                _unitOfWork.QCProfileRepository.Remove(entity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -125,13 +128,22 @@ namespace Server.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<StrainTypeDto>>> GetByStrainId(int strainId)
+        public async Task<ServiceResponse<IEnumerable<QCProfileDto>>> GetListByUserId(string userId)
         {
             try
             {
-                var list = await _unitOfWork.StrainTypeRepository.GetListBy(x => x.StrainId == strainId, s => s.Strain, c => c.Category);
+                var user = await _unitOfWork.UserRepository.GetBy(x => x.Id.ToString() == userId);
+                if (user == null)
+                {
+                    return new ServiceResponse<IEnumerable<QCProfileDto>>
+                    {
+                        Success = false,
+                        Message = $"Xảy ra lỗi trong quá trình lấy danh sách cấu hình QC."
+                    };
+                }
+                var list = await _unitOfWork.QCProfileRepository.GetListBy(x => x.LabId == user.LabId, m => m.Method, c => c.Category);
 
-                return new ServiceResponse<IEnumerable<StrainTypeDto>>
+                return new ServiceResponse<IEnumerable<QCProfileDto>>
                 {
                     Success = true,
                     Data = list.ConvertToDto()
@@ -139,29 +151,29 @@ namespace Server.Services
             }
             catch (Exception)
             {
-                return new ServiceResponse<IEnumerable<StrainTypeDto>>
+                return new ServiceResponse<IEnumerable<QCProfileDto>>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách loại chủng."
+                    Message = $"Xảy ra lỗi trong quá trình lấy danh sách cấu hình QC."
                 };
             }
         }
 
-        public async Task<ServiceResponse<StrainTypeDto?>> GetById(int id)
+        public async Task<ServiceResponse<QCProfileDto?>> GetById(int id)
         {
             try
             {
-                var entity = await _unitOfWork.StrainTypeRepository.GetBy(x => x.Id == id, c => c.Category, s => s.Strain);
+                var entity = await _unitOfWork.QCProfileRepository.GetBy(x => x.Id == id, c => c.Category, m => m.Method);
                 if (entity == null)
                 {
-                    return new ServiceResponse<StrainTypeDto?>
+                    return new ServiceResponse<QCProfileDto?>
                     {
                         Success = false,
-                        Message = $"Không có loại chủng cần tìm."
+                        Message = $"Không có cấu hình QC cần tìm."
                     };
                 }
 
-                return new ServiceResponse<StrainTypeDto?>
+                return new ServiceResponse<QCProfileDto?>
                 {
                     Success = true,
                     Data = entity.ConvertToDto()
@@ -169,32 +181,34 @@ namespace Server.Services
             }
             catch (Exception)
             {
-                return new ServiceResponse<StrainTypeDto?>
+                return new ServiceResponse<QCProfileDto?>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình lấy loại chủng."
+                    Message = $"Xảy ra lỗi trong quá trình lấy cấu hình QC."
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> Update(StrainTypeDto request)
+        public async Task<ServiceResponse<bool>> Update(QCProfileDto request)
         {
             try
             {
-                var entity = await _unitOfWork.StrainTypeRepository.GetBy(x => x.Id == request.Id);
+                var entity = await _unitOfWork.QCProfileRepository.GetBy(x => x.Id == request.Id);
                 if (entity == null)
                 {
                     return new ServiceResponse<bool>
                     {
                         Success = false,
-                        Message = $"Không có loại chủng nào cần tìm."
+                        Message = $"Không có cấu hình QC nào cần tìm."
                     };
                 }
 
                 entity.CategoryId = request.CategoryId;
-                entity.InUse = request.InUse;
+                entity.MethodId = request.MethodId;
+                entity.QCName = request.QCName;
+                entity.Hide = request.Hide;
 
-                _unitOfWork.StrainTypeRepository.Update(entity);
+                _unitOfWork.QCProfileRepository.Update(entity);
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<bool>
@@ -208,7 +222,7 @@ namespace Server.Services
                 return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Xảy ra lỗi trong quá trình cập nhật loại chủng."
+                    Message = $"Xảy ra lỗi trong quá trình cập nhật cấu hình QC."
                 };
             }
         }

@@ -1,10 +1,12 @@
 ﻿using BaseLibrary.Dtos;
 using BaseLibrary.Extentions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
 
 namespace Server.Controllers
 {
+    [Authorize(Policy = "RequireAdminRole")]
     [Route("api/[controller]")]
     [ApiController]
     public class LaboratoryController : ControllerBase

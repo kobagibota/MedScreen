@@ -1,8 +1,9 @@
-﻿using BaseLibrary.Extentions;
+﻿using BaseLibrary.Entities;
+using BaseLibrary.Extentions;
 
-namespace BaseLibrary.Entities
+namespace BaseLibrary.Dtos
 {
-    public class QC
+    public class QCDto
     {
         public int Id { get; set; }
         public int LabId { get; set; }
@@ -14,12 +15,8 @@ namespace BaseLibrary.Entities
         public QCStatus Status { get; set; } = QCStatus.New;
         public DateTime DateCreated { get; set; }
 
-        public virtual required Laboratory Laboratory { get; set; }
-        public virtual required AppUser User { get; set; }
-        public virtual required QCProfile QCProfile { get; set; }
+        public required string UserFullName { get; set; }
+        public required string QCName { get; set; }
         public virtual QC? ReQC { get; set; }
-
-        public List<UseWith>? UseWiths { get; set; }
-        public List<Result>? Results { get; set; }
     }
 }

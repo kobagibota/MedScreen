@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using BaseLibrary.Entities;
 using ServerLibrary.Configurations;
+using System.Reflection.Emit;
 
 namespace ServerLibrary.Data
 {
@@ -10,13 +11,10 @@ namespace ServerLibrary.Data
     {
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            // Phải nằm trên Fluent API
-            // base.OnModelCreating(builder);
+            // Identity Config phải nằm trên Fluent API
 
             #region Identity Config
 
-            //builder.Entity<IdentityUser<Guid>>().ToTable("AppUsers");
-            //builder.Entity<IdentityRole<Guid>>().ToTable("AppRoles");
             builder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims").HasKey(x => x.Id);
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("AppRoleClaims").HasKey(x => x.Id);
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("AppUserLogins").HasKey(x => x.UserId);
@@ -57,6 +55,8 @@ namespace ServerLibrary.Data
             //Data seeding
             builder.Seed();
         }
+
+        //Add-Migration InitialDB -OutputDir Data/Migrations
 
         public DbSet<AppLog> AppLogs { get; set; }
         public DbSet<AppRole> AppRoles { get; set; }

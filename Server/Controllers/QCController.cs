@@ -1,4 +1,5 @@
 ﻿using BaseLibrary.Dtos;
+using BaseLibrary.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
@@ -8,19 +9,19 @@ namespace Server.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class MethodController : ControllerBase
+    public class QCController : ControllerBase
     {
         #region Private Members
 
-        private readonly IMethodService _methodServices;
+        private readonly IQCService _qcService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public MethodController(IMethodService methodServices)
+        public QCController(IQCService qcService)
         {
-            _methodServices = methodServices;
+            _qcService = qcService;
         }
 
         #endregion Constructor
@@ -28,16 +29,17 @@ namespace Server.Controllers
         #region Methods
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Route("lab/{id}")]
+        public async Task<IActionResult> GetAll(int id, [FromQuery] DateOnly qcDate)
         {
-            var response = await _methodServices.GetAll();
+            var response = await _qcService.GetByLabId(id, qcDate);
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _methodServices.GetById(id);
+            var response = await _qcService.GetById(id);
 
             if (response == null)
                 return NotFound();
@@ -46,7 +48,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] MethodDto request)
+        public async Task<IActionResult> Create([FromBody] QCDto request)
         {
             try
             {
@@ -55,7 +57,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _methodServices.Add(request);
+                var response = await _qcService.Add(request);
 
                 if (response.Success)
                 {
@@ -71,8 +73,7 @@ namespace Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] MethodDto request)
+        public async Task<IActionResult> Update([FromBody] QCDto request)
         {
             try
             {
@@ -81,7 +82,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _methodServices.Update(id, request);
+                var response = await _qcService.Update(request);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -100,7 +101,7 @@ namespace Server.Controllers
         {
             try
             {
-                var response = await _methodServices.Delete(id);
+                var response = await _qcService.Delete(id);
 
                 if (!response.Success)
                 {
@@ -108,6 +109,44 @@ namespace Server.Controllers
                 }
 
                 return Ok(response);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý");
+            }
+        }
+
+        [HttpPut]
+        [Route("action/{id}")]
+        public async Task<IActionResult> UpdateAction(int id, [FromBody] string action)
+        {
+            try
+            {
+                var response = await _qcService.UpdateAction(id, action);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                return BadRequest(response.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý");
+            }
+        }
+
+        [HttpPut]
+        [Route("status/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] QCStatus status)
+        {
+            try
+            {
+                var response = await _qcService.UpdateStatus(id, status);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                return BadRequest(response.Message);
             }
             catch (Exception)
             {

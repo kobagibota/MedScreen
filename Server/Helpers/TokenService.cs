@@ -51,8 +51,7 @@ public class TokenService
     public ClaimsPrincipal ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var sha256 = SHA256.Create();
-        var keyBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(_configuration["Jwt:SecurityKey"]!));
+        var keyBytes = SHA256.HashData(Encoding.UTF8.GetBytes(_configuration["Jwt:SecurityKey"]!));
 
         var tokenValidationParameters = new TokenValidationParameters
         {

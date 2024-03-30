@@ -13,7 +13,7 @@ namespace ServerLibrary.Configurations
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.TestQCId).IsRequired();
-            builder.Property(x => x.LotNumber).IsRequired();
+            builder.Property(x => x.LotNumber).IsRequired().HasMaxLength(100);
             builder.Property(x => x.ExpDate).IsRequired().HasColumnType("date").HasAnnotation("CheckConstraint", "ExpDate >= GETDATE()");
 
             builder.HasOne(o => o.TestQC).WithMany(m => m.LotTests).HasForeignKey(i => i.TestQCId).OnDelete(DeleteBehavior.Cascade);

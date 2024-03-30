@@ -64,9 +64,9 @@ namespace Server.Controllers
 
                 return BadRequest(categoryResponse.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý");
             }
         }
 
@@ -88,9 +88,9 @@ namespace Server.Controllers
                 }
                 return BadRequest(categoryResponse.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý");
             }
         }
 
@@ -109,9 +109,9 @@ namespace Server.Controllers
 
                 return Ok(categoryResponse);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý");
             }
         }
 

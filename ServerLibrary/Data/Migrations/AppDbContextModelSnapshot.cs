@@ -85,19 +85,19 @@ namespace ServerLibrary.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("191d2401-ce54-4aec-89da-5cdb393558b4"),
+                            Id = new Guid("f50888b1-b708-47f6-b73c-6715fed033c4"),
                             Description = "Quản trị hệ thống",
                             Name = "Administrator"
                         },
                         new
                         {
-                            Id = new Guid("a4205ee0-8d4b-4a1c-bba2-0fc5c81a79c8"),
+                            Id = new Guid("30be6250-de6a-4c19-826f-f145d1ffbb47"),
                             Description = "Quản lý",
                             Name = "Manager"
                         },
                         new
                         {
-                            Id = new Guid("5851e421-0a75-410a-9bc0-e8a5219b0ddf"),
+                            Id = new Guid("6e2cb26b-707b-44a1-906d-13037799e7a5"),
                             Description = "Người dùng",
                             Name = "User"
                         });
@@ -133,6 +133,9 @@ namespace ServerLibrary.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LabId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LaboratoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
@@ -172,13 +175,13 @@ namespace ServerLibrary.Data.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasMaxLength(200)
+                        .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(200)");
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LabId");
+                    b.HasIndex("LaboratoryId");
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -188,21 +191,21 @@ namespace ServerLibrary.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("827f5530-eda5-4262-b04f-77fcf56a1773"),
+                            Id = new Guid("29dbbd3d-6077-4ba8-9406-72855ba1e52f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8c579124-1d4d-48d3-a8a9-b65d8b657be7",
+                            ConcurrencyStamp = "dc4768dc-bed3-426f-bf3a-6e8dac50bcba",
                             Email = "superadmin@gmail.com",
                             EmailConfirmed = false,
                             FirstName = "Hoằng",
-                            LabId = 1,
+                            LabId = 0,
                             LastName = "Nguyễn Tấn",
                             LockoutEnabled = false,
                             NormalizedEmail = "SUPERADMIN@GMAIL.COM",
                             NormalizedUserName = "SUPERADMIN",
-                            PasswordHash = "$2a$11$ZUM//0kRv7hp7aKm9NR.TOeDQm1O35z.Nao5v8VqFtyelSHDbOPtK",
+                            PasswordHash = "$2a$11$6rRiMGzDOgc2/OZ7XK6qiuL3bF02ABwc.YrOw8/52oArru6dulLq6",
                             PhoneNumber = "123456789",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "63459320-e64f-4b0a-a50d-72fc58229606",
+                            SecurityStamp = "b075807a-edda-47c2-9bba-c5dd20691e6a",
                             TwoFactorEnabled = false,
                             UserName = "superadmin"
                         });
@@ -262,7 +265,8 @@ namespace ServerLibrary.Data.Migrations
 
                     b.Property<string>("LabName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("LabStatus")
                         .ValueGeneratedOnAdd()
@@ -274,7 +278,8 @@ namespace ServerLibrary.Data.Migrations
 
                     b.Property<string>("OrganizationName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -308,13 +313,14 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<bool>("Default")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("ExpDate")
+                    b.Property<DateOnly>("ExpDate")
                         .HasColumnType("date")
                         .HasAnnotation("CheckConstraint", "ExpDate >= GETDATE()");
 
                     b.Property<string>("LotNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("SupplyId")
                         .HasColumnType("int");
@@ -337,13 +343,14 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<bool>("Default")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("ExpDate")
+                    b.Property<DateOnly>("ExpDate")
                         .HasColumnType("date")
                         .HasAnnotation("CheckConstraint", "ExpDate >= GETDATE()");
 
                     b.Property<string>("LotNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("TestQCId")
                         .HasColumnType("int");
@@ -411,7 +418,7 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<int>("LabId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("QCDate")
+                    b.Property<DateOnly>("QCDate")
                         .HasColumnType("date")
                         .HasAnnotation("CheckConstraint", "QCDate <= GETDATE()");
 
@@ -1005,8 +1012,8 @@ namespace ServerLibrary.Data.Migrations
                     b.HasData(
                         new
                         {
-                            RoleId = new Guid("191d2401-ce54-4aec-89da-5cdb393558b4"),
-                            UserId = new Guid("827f5530-eda5-4262-b04f-77fcf56a1773")
+                            RoleId = new Guid("f50888b1-b708-47f6-b73c-6715fed033c4"),
+                            UserId = new Guid("29dbbd3d-6077-4ba8-9406-72855ba1e52f")
                         });
                 });
 
@@ -1047,9 +1054,7 @@ namespace ServerLibrary.Data.Migrations
                 {
                     b.HasOne("BaseLibrary.Entities.Laboratory", "Laboratory")
                         .WithMany("Users")
-                        .HasForeignKey("LabId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LaboratoryId");
 
                     b.Navigation("Laboratory");
                 });

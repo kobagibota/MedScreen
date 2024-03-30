@@ -76,6 +76,10 @@ builder.Services.AddScoped<ILotSupplyService, LotSupplyService>();
 builder.Services.AddScoped<IStrainTypeService, StrainTypeService>();
 builder.Services.AddScoped<ISupplyProfileService, SupplyProfileService>();
 builder.Services.AddScoped<IQCProfileService, QCProfileService>();
+builder.Services.AddScoped<IStandardDetailService, StandardDetailService>();
+builder.Services.AddScoped<IUseWithService, UseWithService>();
+builder.Services.AddScoped<IQCService, QCService>();
+
 
 
 builder.Services.AddCors(option =>

@@ -5,22 +5,22 @@ using Server.Services;
 
 namespace Server.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "RequireAdminRole")]
     [Route("api/[controller]")]
     [ApiController]
-    public class MethodController : ControllerBase
+    public class StandardDetailController : ControllerBase
     {
         #region Private Members
 
-        private readonly IMethodService _methodServices;
+        private readonly IStandardDetailService _standardDetailService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public MethodController(IMethodService methodServices)
+        public StandardDetailController(IStandardDetailService standardDetailService)
         {
-            _methodServices = methodServices;
+            _standardDetailService = standardDetailService;
         }
 
         #endregion Constructor
@@ -28,16 +28,17 @@ namespace Server.Controllers
         #region Methods
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Route("standard/{id}")]
+        public async Task<IActionResult> GetAll(int id)
         {
-            var response = await _methodServices.GetAll();
+            var response = await _standardDetailService.GetListByStandardId(id);
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _methodServices.GetById(id);
+            var response = await _standardDetailService.GetById(id);
 
             if (response == null)
                 return NotFound();
@@ -46,7 +47,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] MethodDto request)
+        public async Task<IActionResult> Create([FromBody] StandardDetailDto request)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _methodServices.Add(request);
+                var response = await _standardDetailService.Add(request);
 
                 if (response.Success)
                 {
@@ -71,8 +72,7 @@ namespace Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] MethodDto request)
+        public async Task<IActionResult> Update([FromBody] StandardDetailDto request)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _methodServices.Update(id, request);
+                var response = await _standardDetailService.Update(request);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -100,7 +100,7 @@ namespace Server.Controllers
         {
             try
             {
-                var response = await _methodServices.Delete(id);
+                var response = await _standardDetailService.Delete(id);
 
                 if (!response.Success)
                 {

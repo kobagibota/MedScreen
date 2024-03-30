@@ -9,9 +9,7 @@ namespace ServerLibrary.Data
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            Guid userId = Guid.NewGuid();
-            Guid roleId = Guid.NewGuid();
-            var newlab = new Laboratory()
+            var lab = new Laboratory()
             {
                 Id = 1,
                 OrganizationName = "BVĐKTƯ Cần Thơ",
@@ -19,13 +17,14 @@ namespace ServerLibrary.Data
                 Address = "315 Nguyễn Văn Linh - An Khánh - Ninh Kiều - Tp. Cần Thơ",
                 LabStatus = LabStatus.Active
             };
+            modelBuilder.Entity<Laboratory>().HasData(lab);
 
-            modelBuilder.Entity<Laboratory>().HasData(newlab);
+            Guid userId = Guid.NewGuid();          
 
             var newUser = new AppUser()
             {
                 Id = userId,
-                LabId = 1,
+                LabId = 0,
                 FirstName = "Hoằng",
                 LastName = "Nguyễn Tấn",
                 Email = "superadmin@gmail.com",
@@ -34,9 +33,12 @@ namespace ServerLibrary.Data
                 UserName = "superadmin",
                 NormalizedUserName = "SUPERADMIN",
                 SecurityStamp = Guid.NewGuid().ToString(),
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("@dmin123")
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("@dmin123"),
+                //Laboratory = lab
             };
             modelBuilder.Entity<AppUser>().HasData(newUser);
+            
+            Guid roleId = Guid.NewGuid();
 
             modelBuilder.Entity<AppRole>().HasData(
                 new AppRole()
@@ -142,5 +144,20 @@ namespace ServerLibrary.Data
                     TypeName = "Định danh tự động"
                 });
         }
+
+        //private static void SeedLaboratories(ModelBuilder modelBuilder)
+        //{
+        //    var newlab = new Laboratory()
+        //    {
+        //        Id = 1,
+        //        OrganizationName = "BVĐKTƯ Cần Thơ",
+        //        LabName = "Khoa Xét Nghiệm",
+        //        Address = "315 Nguyễn Văn Linh - An Khánh - Ninh Kiều - Tp. Cần Thơ",
+        //        LabStatus = LabStatus.Active,
+        //        Users = new List<AppUser> { }
+        //    };
+
+        //    modelBuilder.Entity<Laboratory>().HasData(newlab);
+        //}
     }
 }

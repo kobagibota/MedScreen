@@ -14,7 +14,9 @@ namespace ServerLibrary.Configurations
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.HasIndex(x => x.OrganizationName).IsUnique();
-            builder.Property(x => x.LabName).IsRequired();
+
+            builder.Property(x => x.OrganizationName).HasMaxLength(200);
+            builder.Property(x => x.LabName).IsRequired().HasMaxLength(200);
             builder.Property(x => x.LabStatus).HasDefaultValue(LabStatus.Active);
         }
     }

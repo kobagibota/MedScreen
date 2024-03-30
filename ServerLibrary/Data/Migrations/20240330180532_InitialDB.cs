@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServerLibrary.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -117,13 +117,13 @@ namespace ServerLibrary.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OrganizationName = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LabName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrganizationName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    LabName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Logo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    LabStatus = table.Column<int>(type: "int", nullable: false)
+                    LabStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 1)
                 },
                 constraints: table =>
                 {
@@ -136,7 +136,7 @@ namespace ServerLibrary.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MethodName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    MethodName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,7 +207,8 @@ namespace ServerLibrary.Data.Migrations
                     IpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "varchar(200)", unicode: false, maxLength: 200, nullable: false),
+                    LaboratoryId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -226,11 +227,10 @@ namespace ServerLibrary.Data.Migrations
                 {
                     table.PrimaryKey("PK_AppUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AppUsers_Laboratories_LabId",
-                        column: x => x.LabId,
+                        name: "FK_AppUsers_Laboratories_LaboratoryId",
+                        column: x => x.LaboratoryId,
                         principalTable: "Laboratories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -275,8 +275,7 @@ namespace ServerLibrary.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MethodId = table.Column<int>(type: "int", nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: true),
-                    SupplyName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    SupplyName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -296,7 +295,7 @@ namespace ServerLibrary.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GroupId = table.Column<int>(type: "int", nullable: false),
-                    StrainName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    StrainName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -349,8 +348,7 @@ namespace ServerLibrary.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TestTypeId = table.Column<int>(type: "int", nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: true),
-                    TestQCName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TestQCName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -396,7 +394,7 @@ namespace ServerLibrary.Data.Migrations
                     LabId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     QCProfileId = table.Column<int>(type: "int", nullable: false),
-                    QCDate = table.Column<DateTime>(type: "date", nullable: false),
+                    QCDate = table.Column<DateOnly>(type: "date", nullable: false),
                     ReQCId = table.Column<int>(type: "int", nullable: true),
                     Action = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -435,8 +433,8 @@ namespace ServerLibrary.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SupplyId = table.Column<int>(type: "int", nullable: false),
-                    LotNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpDate = table.Column<DateTime>(type: "date", nullable: false),
+                    LotNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ExpDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Default = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -454,13 +452,16 @@ namespace ServerLibrary.Data.Migrations
                 name: "SupplyProfiles",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     SupplyId = table.Column<int>(type: "int", nullable: false),
                     QCProfileId = table.Column<int>(type: "int", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: true),
                     InUse = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SupplyProfiles", x => new { x.SupplyId, x.QCProfileId });
+                    table.PrimaryKey("PK_SupplyProfiles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SupplyProfiles_QCProfiles_QCProfileId",
                         column: x => x.QCProfileId,
@@ -478,13 +479,15 @@ namespace ServerLibrary.Data.Migrations
                 name: "StrainTypes",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     StrainId = table.Column<int>(type: "int", nullable: false),
                     InUse = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StrainTypes", x => new { x.StrainId, x.CategoryId });
+                    table.PrimaryKey("PK_StrainTypes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_StrainTypes_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -506,8 +509,8 @@ namespace ServerLibrary.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TestQCId = table.Column<int>(type: "int", nullable: false),
-                    LotNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpDate = table.Column<DateTime>(type: "date", nullable: false),
+                    LotNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ExpDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Default = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -611,12 +614,15 @@ namespace ServerLibrary.Data.Migrations
                 name: "QCProfileDetails",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     QCProfileId = table.Column<int>(type: "int", nullable: false),
-                    StandardDetailId = table.Column<int>(type: "int", nullable: false)
+                    StandardDetailId = table.Column<int>(type: "int", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_QCProfileDetails", x => new { x.QCProfileId, x.StandardDetailId });
+                    table.PrimaryKey("PK_QCProfileDetails", x => x.Id);
                     table.ForeignKey(
                         name: "FK_QCProfileDetails_QCProfiles_QCProfileId",
                         column: x => x.QCProfileId,
@@ -676,15 +682,20 @@ namespace ServerLibrary.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("1442ee19-193f-4629-b867-aea19a1f4e45"), null, "Người dùng", "User", null },
-                    { new Guid("5bd5c2f7-a94c-4f02-aa06-b36430f730be"), null, "Quản trị hệ thống", "Administrator", null },
-                    { new Guid("f706357f-8884-449c-89e7-94e903ee40bc"), null, "Quản lý", "Manager", null }
+                    { new Guid("30be6250-de6a-4c19-826f-f145d1ffbb47"), null, "Quản lý", "Manager", null },
+                    { new Guid("6e2cb26b-707b-44a1-906d-13037799e7a5"), null, "Người dùng", "User", null },
+                    { new Guid("f50888b1-b708-47f6-b73c-6715fed033c4"), null, "Quản trị hệ thống", "Administrator", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "AppUserRoles",
                 columns: new[] { "RoleId", "UserId" },
-                values: new object[] { new Guid("5bd5c2f7-a94c-4f02-aa06-b36430f730be"), new Guid("948f3047-5c1c-4e78-92c2-06128ded41b3") });
+                values: new object[] { new Guid("f50888b1-b708-47f6-b73c-6715fed033c4"), new Guid("29dbbd3d-6077-4ba8-9406-72855ba1e52f") });
+
+            migrationBuilder.InsertData(
+                table: "AppUsers",
+                columns: new[] { "Id", "AccessFailedCount", "Avatar", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IpAddress", "LabId", "LaboratoryId", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserAgent", "UserName" },
+                values: new object[] { new Guid("29dbbd3d-6077-4ba8-9406-72855ba1e52f"), 0, null, "dc4768dc-bed3-426f-bf3a-6e8dac50bcba", "superadmin@gmail.com", false, "Hoằng", null, 0, null, "Nguyễn Tấn", false, null, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "$2a$11$6rRiMGzDOgc2/OZ7XK6qiuL3bF02ABwc.YrOw8/52oArru6dulLq6", "123456789", false, "b075807a-edda-47c2-9bba-c5dd20691e6a", false, null, "superadmin" });
 
             migrationBuilder.InsertData(
                 table: "Categories",
@@ -733,30 +744,33 @@ namespace ServerLibrary.Data.Migrations
                     { 5, "Định danh tự động", null }
                 });
 
-            migrationBuilder.InsertData(
-                table: "AppUsers",
-                columns: new[] { "Id", "AccessFailedCount", "Avatar", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IpAddress", "LabId", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserAgent", "UserName" },
-                values: new object[] { new Guid("948f3047-5c1c-4e78-92c2-06128ded41b3"), 0, null, "8ac653c1-64b7-4cbe-bc24-a20073fe9c77", "superadmin@gmail.com", false, "Hoằng", null, 1, "Nguyễn Tấn", false, null, "SUPERADMIN@GMAIL.COM", "SUPERADMIN", "AQAAAAIAAYagAAAAEJv6Z0mUvAR8dIs06/uU6mcEl6+k1HgGljYr4znr/UFtEINKMmXYUSQvlTecy6RxVg==", "123456789", false, "06c3b09d-747b-4933-889f-761b45f61ae9", false, null, "superadmin" });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AppLogs_UserId",
                 table: "AppLogs",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppUsers_LabId",
+                name: "IX_AppUsers_LaboratoryId",
                 table: "AppUsers",
-                column: "LabId");
+                column: "LaboratoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppUsers_UserName",
                 table: "AppUsers",
-                column: "UserName");
+                column: "UserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_CategoryName",
+                table: "Categories",
+                column: "CategoryName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Laboratories_OrganizationName",
                 table: "Laboratories",
-                column: "OrganizationName");
+                column: "OrganizationName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LotSupplies_SupplyId",
@@ -769,9 +783,21 @@ namespace ServerLibrary.Data.Migrations
                 column: "TestQCId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Methods_MethodName",
+                table: "Methods",
+                column: "MethodName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QCActions_ActionName",
                 table: "QCActions",
-                column: "ActionName");
+                column: "ActionName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QCProfileDetails_QCProfileId",
+                table: "QCProfileDetails",
+                column: "QCProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QCProfileDetails_StandardDetailId",
@@ -792,6 +818,12 @@ namespace ServerLibrary.Data.Migrations
                 name: "IX_QCProfiles_MethodId",
                 table: "QCProfiles",
                 column: "MethodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QCProfiles_QCName",
+                table: "QCProfiles",
+                column: "QCName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_QCs_LabId",
@@ -861,12 +893,14 @@ namespace ServerLibrary.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Standards_StandardName",
                 table: "Standards",
-                column: "StandardName");
+                column: "StandardName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_StrainGroups_GroupName",
                 table: "StrainGroups",
-                column: "GroupName");
+                column: "GroupName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Strains_GroupId",
@@ -874,9 +908,20 @@ namespace ServerLibrary.Data.Migrations
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Strains_StrainName",
+                table: "Strains",
+                column: "StrainName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StrainTypes_CategoryId",
                 table: "StrainTypes",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StrainTypes_StrainId",
+                table: "StrainTypes",
+                column: "StrainId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Supplies_MethodId",
@@ -884,9 +929,20 @@ namespace ServerLibrary.Data.Migrations
                 column: "MethodId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Supplies_SupplyName",
+                table: "Supplies",
+                column: "SupplyName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SupplyProfiles_QCProfileId",
                 table: "SupplyProfiles",
                 column: "QCProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupplyProfiles_SupplyId",
+                table: "SupplyProfiles",
+                column: "SupplyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TestProfiles_CategoryId",
@@ -904,9 +960,21 @@ namespace ServerLibrary.Data.Migrations
                 column: "TestTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TestQCs_TestQCName",
+                table: "TestQCs",
+                column: "TestQCName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TestQCs_TestTypeId",
                 table: "TestQCs",
                 column: "TestTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestTypes_TypeName",
+                table: "TestTypes",
+                column: "TypeName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UseWiths_LotSupplyId",

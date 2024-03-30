@@ -8,19 +8,19 @@ namespace Server.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class MethodController : ControllerBase
+    public class UseWithController : ControllerBase
     {
         #region Private Members
 
-        private readonly IMethodService _methodServices;
+        private readonly IUseWithService _useWithService;
 
         #endregion Private Members
 
         #region Constructor
 
-        public MethodController(IMethodService methodServices)
+        public UseWithController(IUseWithService useWithService)
         {
-            _methodServices = methodServices;
+            _useWithService = useWithService;
         }
 
         #endregion Constructor
@@ -28,16 +28,17 @@ namespace Server.Controllers
         #region Methods
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Route("qc/{id}")]
+        public async Task<IActionResult> GetAll(int id)
         {
-            var response = await _methodServices.GetAll();
+            var response = await _useWithService.GetByQCId(id);
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _methodServices.GetById(id);
+            var response = await _useWithService.GetById(id);
 
             if (response == null)
                 return NotFound();
@@ -46,7 +47,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] MethodDto request)
+        public async Task<IActionResult> Create([FromBody] UseWithDto request)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _methodServices.Add(request);
+                var response = await _useWithService.Add(request);
 
                 if (response.Success)
                 {
@@ -71,8 +72,7 @@ namespace Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] MethodDto request)
+        public async Task<IActionResult> Update([FromBody] UseWithDto request)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Server.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var response = await _methodServices.Update(id, request);
+                var response = await _useWithService.Update(request);
                 if (response.Success)
                 {
                     return Ok(response);
@@ -100,7 +100,7 @@ namespace Server.Controllers
         {
             try
             {
-                var response = await _methodServices.Delete(id);
+                var response = await _useWithService.Delete(id);
 
                 if (!response.Success)
                 {

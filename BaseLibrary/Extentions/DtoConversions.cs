@@ -1,6 +1,5 @@
 ﻿using BaseLibrary.Dtos;
 using BaseLibrary.Entities;
-using System.Collections.Generic;
 
 namespace BaseLibrary.Extentions
 {
@@ -256,7 +255,7 @@ namespace BaseLibrary.Extentions
 
         public static IEnumerable<UserDto> ConvertToDto(this IEnumerable<AppUser> users, IEnumerable<string> roles)
         {
-            return users.Select(user=>user.ConvertToDto(roles));
+            return users.Select(user => user.ConvertToDto(roles));
         }
 
         #endregion
@@ -298,7 +297,7 @@ namespace BaseLibrary.Extentions
                 CategoryId = qcProfile.CategoryId,
                 QCName = qcProfile.QCName,
                 Hide = qcProfile.Hide,
-                LaboratoryName = qcProfile.Laboratory.LabName,
+                LaboratoryName = qcProfile.Laboratory!.LabName,
                 CategoryName = qcProfile.Category.CategoryName,
                 MethodName = qcProfile.Method.MethodName
             };
@@ -313,15 +312,93 @@ namespace BaseLibrary.Extentions
 
         #endregion
 
-        #region Category
+        #region StandardDetail
+
+        public static StandardDetailDto ConvertToDto(this StandardDetail standardDetail)
+        {
+            var standardDetailDto = new StandardDetailDto()
+            {
+                Id = standardDetail.Id,
+                StandardId = standardDetail.StandardId,
+                MethodId = standardDetail.MethodId,
+                CategoryId = standardDetail.CategoryId,
+                TestQCId = standardDetail.TestQCId,
+                StrainId = standardDetail.StrainId,
+                Concentration = standardDetail.Concentration,
+                Threshold = standardDetail.Threshold,
+                LimitMin = standardDetail.LimitMin,
+                LimitMax = standardDetail.LimitMax,
+                Normal = standardDetail.Normal,
+                Qualitative = standardDetail.Qualitative,
+                NormalRange = standardDetail.NormalRange,
+                ResultType = standardDetail.ResultType,
+                StandardName = standardDetail.Standard.StandardName,
+                CategoryName = standardDetail.Category.CategoryName,
+                MethodName = standardDetail.Method.MethodName,
+                TestQCName = standardDetail.TestQC.TestQCName,
+                StrainName = standardDetail.Strain.StrainName
+            };
+            return standardDetailDto;
+        }
 
 
+        public static IEnumerable<StandardDetailDto> ConvertToDto(this IEnumerable<StandardDetail> standardDetails)
+        {
+            return standardDetails.Select(ConvertToDto);
+        }
 
         #endregion
 
-        #region Category
+        #region UseWith
 
+        public static UseWithDto ConvertToDto(this UseWith useWith)
+        {
+            var useWithDto = new UseWithDto()
+            {
+                Id = useWith.Id,
+                QCId = useWith.QCId,
+                SupplyId = useWith.SupplyId,
+                SupplyName = useWith.Supply.SupplyName,
+                LotSupplyId = useWith.LotSupplyId,
+                LotNumber = useWith.LotSupply.LotNumber,
+                ExpDate = useWith.LotSupply.ExpDate
+            };
+            return useWithDto;
+        }
 
+        public static IEnumerable<UseWithDto> ConvertToDto(this IEnumerable<UseWith> useWiths)
+        {
+            return useWiths.Select(ConvertToDto);
+        }
+
+        #endregion
+
+        #region QC
+
+        public static QCDto ConvertToDto(this QC qc)
+        {
+            var qcDto = new QCDto()
+            {
+                Id = qc.Id,
+                LabId = qc.LabId,
+                UserId= qc.UserId,
+                QCProfileId = qc.QCProfileId,
+                QCDate = qc.QCDate,
+                ReQCId = qc.ReQCId,
+                Action = qc.Action,
+                Status = qc.Status,
+                DateCreated = qc.DateCreated,
+                UserFullName = qc.User.LastName + " " + qc.User.FirstName,
+                QCName = qc.QCProfile.QCName,
+                ReQC = qc.ReQC
+            };
+            return qcDto;
+        }
+
+        public static IEnumerable<QCDto> ConvertToDto(this IEnumerable<QC> qcs)
+        {
+            return qcs.Select(ConvertToDto);
+        }
 
         #endregion
     }

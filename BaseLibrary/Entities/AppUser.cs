@@ -11,7 +11,7 @@ namespace BaseLibrary.Entities
         public string? UserAgent { get; set; }
         public string? Avatar { get; set; }
 
-        public virtual Laboratory Laboratory { get; set; }
+        public virtual Laboratory? Laboratory { get; set; }
 
         public List<QC>? QCs { get; set; }
         public List<AppLog>? AppLogs { get; set; }

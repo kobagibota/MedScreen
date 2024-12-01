@@ -19,10 +19,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "MQC Web API", 
-        Version = "v1" 
+    option.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "MQC Web API",
+        Version = "v1"
     });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
@@ -60,7 +60,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppDbContext>();
 
-
 builder.Services.AddScoped<ILaboratoryService, LaboratoryService>();
 builder.Services.AddScoped<IQCActionService, QCActionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -80,8 +79,6 @@ builder.Services.AddScoped<IStandardDetailService, StandardDetailService>();
 builder.Services.AddScoped<IUseWithService, UseWithService>();
 builder.Services.AddScoped<IQCService, QCService>();
 
-
-
 builder.Services.AddCors(option =>
 {
     option.AddPolicy("AllowBlazorWasm", builder => builder
@@ -89,9 +86,9 @@ builder.Services.AddCors(option =>
     .AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 });
 
-var jwtsection = builder.Configuration.GetSection("Jwt");
+var jwtSection = builder.Configuration.GetSection("Jwt");
 
-builder.Services.Configure<JwtSection>(jwtsection);
+builder.Services.Configure<JwtSection>(jwtSection);
 
 builder.Services.AddAuthentication(option =>
 {
@@ -105,9 +102,9 @@ builder.Services.AddAuthentication(option =>
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
         ValidateLifetime = true,
-        ValidIssuer = jwtsection.GetValue<string>("ValidIssuer"),
-        ValidAudience = jwtsection.GetValue<string>("ValidAudience"),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtsection.GetValue<string>("SecurityKey")!)),
+        ValidIssuer = jwtSection.GetValue<string>("ValidIssuer"),
+        ValidAudience = jwtSection.GetValue<string>("ValidAudience"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection.GetValue<string>("SecurityKey")!)),
         ClockSkew = TimeSpan.Zero
     };
 });

@@ -1,0 +1,85 @@
+﻿@page "/login"
+@using BaseLibrary.Dtos
+@inject NavigationManager navigaManager
+
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>
+                <Icon Name="IconName.Key" />
+                Đăng nhập
+            </ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+        <Validations @ref="modalValidations" Model="@modalLogin" ValidateOnLoad="false">
+                <Validation>
+                    <Field Horizontal Margin="Margin.Is4.OnY">
+                        <FieldLabel RequiredIndicator ColumnSize="ColumnSize.IsFull.OnTablet.Is3.OnDesktop">Tài khoản</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.IsFull.OnTablet.Is9.OnDesktop">
+                            <TextEdit Placeholder="Tài khoản" @bind-Text="@modalLogin.UserName">
+                                <Feedback>
+                                    <ValidationError>Chưa nhập tài khoản đăng nhập</ValidationError>
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field Horizontal Margin="Margin.Is4.OnY">
+                        <FieldLabel RequiredIndicator ColumnSize="ColumnSize.IsFull.OnTablet.Is3.OnDesktop">Mật khẩu</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.IsFull.OnTablet.Is9.OnDesktop">
+                            <TextEdit Placeholder="Mật khẩu" @bind-Text="@modalLogin.Password" Role="TextRole.Password">
+                                <Feedback>
+                                    <ValidationError>Chưa nhập mật khẩu</ValidationError>
+                                </Feedback>
+                            </TextEdit>
+                        </FieldBody>
+                    </Field>
+                </Validation>
+            </Validations>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Primary" Clicked="@CloseUserModal">Đăng nhập</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    #region Private members
+
+    Modal modalRef;
+    Validations modalValidations;
+    LoginDto modalLogin = new();
+    bool modalOpened = false;
+
+    #endregion
+
+    #region Menthods
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !modalOpened)
+        {
+            modalOpened = true;
+            await OpenUserModal();
+        }
+    }
+
+    async Task OpenUserModal()
+    {
+        modalLogin = new();
+
+        await modalValidations.ClearAll();
+
+        await modalRef.Show();
+    }
+    Task CloseUserModal()
+    {
+        // Điều hướng về trang chủ sau khi đăng nhập thành công
+        navigaManager.NavigateTo("/");
+
+        return modalRef.Hide();
+    }
+    #endregion
+}

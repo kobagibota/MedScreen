@@ -45,12 +45,12 @@ namespace ServerLibrary.Data
             builder.ApplyConfiguration(new StrainTypeConfiguration());
             builder.ApplyConfiguration(new SupplyConfiguration());
             builder.ApplyConfiguration(new SupplyProfileConfiguration());
-            builder.ApplyConfiguration(new TestProfileConfiguration());            
+            builder.ApplyConfiguration(new TestProfileConfiguration());
             builder.ApplyConfiguration(new TestQCConfiguration());
             builder.ApplyConfiguration(new TestTypeConfiguration());
             builder.ApplyConfiguration(new UseWithConfiguration());
 
-            #endregion
+            #endregion Configure using Fluent API
 
             //Data seeding
             builder.Seed();
@@ -61,6 +61,7 @@ namespace ServerLibrary.Data
         public DbSet<AppLog> AppLogs { get; set; }
         public DbSet<AppRole> AppRoles { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
+
         public DbSet<Category> Categories { get; set; }
         public DbSet<Laboratory> Laboratories { get; set; }
         public DbSet<LotSupply> LotSupplies { get; set; }

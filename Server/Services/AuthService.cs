@@ -4,6 +4,8 @@ using BaseLibrary.Extentions;
 using BaseLibrary.Interfaces;
 using BaseLibrary.Respones;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using NuGet.Protocol.Plugins;
 
 namespace Server.Services
 {
@@ -11,10 +13,10 @@ namespace Server.Services
 
     public interface IAuthService
     {
-        Task<LoginResponse> Login(LoginDto loginDto);        
+        Task<LoginResponse> Login(LoginDto loginDto);
     }
 
-    #endregion
+    #endregion Interface
 
     public class AuthService : IAuthService
     {
@@ -24,7 +26,7 @@ namespace Server.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly TokenService _tokenService;
 
-        #endregion
+        #endregion Private properties
 
         #region Constructor
 
@@ -35,7 +37,7 @@ namespace Server.Services
             _tokenService = tokenService;
         }
 
-        #endregion
+        #endregion Constructor
 
         #region Methods
 
@@ -43,22 +45,17 @@ namespace Server.Services
         {
             try
             {
-                var entity = await _unitOfWork.UserRepository.GetBy(x => x.UserName == loginDto.UserName);
-                if (entity == null)
+                var entity = await _userManager.FindByNameAsync(loginDto.UserName);
+                if (entity == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, entity.PasswordHash))
                 {
-                    return new LoginResponse(false, "Tài khoản không tồn tại");
-                }
-                var checkPass = BCrypt.Net.BCrypt.Verify(loginDto.Password, entity.PasswordHash);
-                if (!checkPass)
-                {
-                    return new LoginResponse(false, "Mật khẩu chưa chính xác");
+                    return new LoginResponse(false, "Tài khoản hoặc mật khẩu không chính xác");
                 }
 
                 var roles = await _userManager.GetRolesAsync(entity);
                 var userDto = entity.ConvertToDto(roles);
-
                 var token = _tokenService.GenerateToken(userDto);
-                return new LoginResponse(true, "Đăng nhập thành công", token);
+                var refreshToken = _tokenService.GenerateRefreshToken();
+                return new LoginResponse(true, "Đăng nhập thành công", token, refreshToken);
             }
             catch (Exception)
             {
@@ -66,7 +63,6 @@ namespace Server.Services
             }
         }
 
-
-        #endregion
+        #endregion Methods
     }
 }
